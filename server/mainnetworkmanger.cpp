@@ -7,6 +7,7 @@ MainNetworkManger::MainNetworkManger(QObject *parent) : QObject(parent)
 {
     server->listen(QHostAddress::Any,8864);
     QObject::connect(server,&QTcpServer::newConnection,this,&MainNetworkManger::newConnection);
+    connect(server,&QTcpServer::acceptError,this,&MainNetworkManger::err);
 }
 
 void MainNetworkManger::newConnection()
@@ -15,4 +16,9 @@ void MainNetworkManger::newConnection()
         QTcpSocket *sock=server->nextPendingConnection();
         new RequestProcesser(nullptr,sock);
     }
+}
+
+void MainNetworkManger::err()
+{
+    qDebug() << server->errorString();
 }

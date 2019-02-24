@@ -13,6 +13,7 @@ public:
     void send(QString str);
 public slots:
     void newConnection();
+    void err();
 private:
     QTcpServer *server = new QTcpServer;
 };

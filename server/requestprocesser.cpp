@@ -3,6 +3,7 @@
 #include <QDebug>
 #include "login.h"
 #include "ranking.h"
+#include "chess_gaming.h"
 RequestProcesser::RequestProcesser(QObject *parent,QTcpSocket* so) : QObject(parent)
 {
     socket=so;
@@ -85,8 +86,11 @@ void RequestProcesser::readyRead()
         else if (map.value("type").toString()=="logout")
             Logout();
         else if (isLogin)
+        {
             if (map.value("type").toString()=="rank")
-                new ranking(nullptr,this,map.value("numbers").toInt(),username,map.value("rank_info").toString());
+                new ranking(nullptr,this,map.value("numbers").toInt(),username,map.value("rank_info").toString(),map.value("to").toString());
+                //new ranking(nullptr,this,map.value("numbers").toInt(),username,map.value("rank_info").toString());
+        }
     }
     else
         emit Message(map);

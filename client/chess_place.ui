@@ -6,12 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>850</height>
+    <width>640</width>
+    <height>640</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Chess</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
   </property>
  </widget>
  <resources/>

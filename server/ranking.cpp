@@ -2,7 +2,8 @@
 #include "ranking.h"
 #include <QDebug>
 #include <qthread.h>
-ranking::ranking(QObject *parent,RequestProcesser* mnm,int n,QString _username,QString rank_info) : QObject(parent),nb(n),username(_username),ntwkmgr(mnm)
+#include "chess_gaming.h"
+ranking::ranking(QObject *parent,RequestProcesser* mnm,int n,QString _username,QString rank_info,QString to) : QObject(parent),nb(n),username(_username),ntwkmgr(mnm)
 {    
     rkif=rank_info;
     this->SendRankStartInfo();
@@ -15,6 +16,7 @@ ranking::ranking(QObject *parent,RequestProcesser* mnm,int n,QString _username,Q
     });
     if (!this->Join())
         this->SendJoinRankFailedInfo();
+    this->to=to;
 }
 
 void ranking::SendRankStartInfo()
@@ -54,10 +56,11 @@ void ranking::SendFulled(QStringList strlist)
                                                     std::make_pair("close","rank"),
                                                     std::make_pair("to","chess_place"),
                                                     std::make_pair("players",strlist),
+                                                    std::make_pair("you",username),
                                                     std::make_pair("rank_info",rkif)
                                                 })));
+    new chess_gaming(strlist,rkif,ntwkmgr,ntwkmgr);
     this->deleteLater();
-
 }
 
 void ranking::recvs(QVariantMap map)

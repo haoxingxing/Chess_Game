@@ -27,7 +27,8 @@ void menu::on_start_clicked()
                                                      FM
                                                   std::make_pair("type","rank"),
                                                   std::make_pair("numbers",2),
-                                                  std::make_pair("rank_info","25*25")
+                                                  std::make_pair("rank_info","25*25"),
+                                                  std::make_pair("to","chess_place")
                                                  })));
 }
 

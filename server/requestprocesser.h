@@ -10,6 +10,7 @@ public:
     explicit RequestProcesser(QObject *parent = nullptr,QTcpSocket* so = nullptr);
     void send(QString str);
     //How To :
+    QString username;
     void ToLogin();
     void SendLoginErrorMessage();
     void SendLoginSuccessMessage();
@@ -27,7 +28,6 @@ public slots:
 private:
     QTcpSocket* socket;
 
-    QString username;
     bool isLogin = false;
 };
 

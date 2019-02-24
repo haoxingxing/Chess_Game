@@ -37,7 +37,7 @@ class ranking : public QObject
 {
     Q_OBJECT
 public:
-    explicit ranking(QObject *parent = nullptr,RequestProcesser* mnm = nullptr,int n=2,QString username="undefine",QString rank_info = "");
+    explicit ranking(QObject *parent = nullptr,RequestProcesser* mnm = nullptr,int n=2,QString username="undefine",QString rank_info = "",QString to = "");
     void SendRankStartInfo();
     void SendJoinRankFailedInfo();
     bool Join();
@@ -51,6 +51,7 @@ private:
     QString username;
     QString rkif;
     RequestProcesser* ntwkmgr;
+    QString to;
 };
 
 #endif // RANKING_H
