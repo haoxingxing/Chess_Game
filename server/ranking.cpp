@@ -7,6 +7,7 @@ ranking::ranking(QObject *parent,RequestProcesser* mnm,int n,QString _username,Q
 {    
     rkif=rank_info;
     this->SendRankStartInfo();
+    this->to=to;
     rkn=new rank_node(this,nb,rank_info);
     connect(rkn,&rank_node::fulled,this,&ranking::SendFulled);
     connect(rkn,&rank_node::number_changed,this,&ranking::SendValueChanged);
@@ -16,7 +17,6 @@ ranking::ranking(QObject *parent,RequestProcesser* mnm,int n,QString _username,Q
     });
     if (!this->Join())
         this->SendJoinRankFailedInfo();
-    this->to=to;
 }
 
 void ranking::SendRankStartInfo()
@@ -54,7 +54,7 @@ void ranking::SendFulled(QStringList strlist)
 
     ntwkmgr->send(Jsoncoder::encode(QVariantMap({
                                                     std::make_pair("close","rank"),
-                                                    std::make_pair("to","chess_place"),
+                                                    std::make_pair("to",to),
                                                     std::make_pair("players",strlist),
                                                     std::make_pair("you",username),
                                                     std::make_pair("rank_info",rkif)

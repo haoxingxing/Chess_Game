@@ -8,7 +8,7 @@ login::login(MainNetworkManger *ntmgr,QWidget *parent) :
 {
     ui->setupUi(this);
     ui->emsg->hide();
-    connect(ntwkmgrr,&MainNetworkManger::Message,this,&login::recv);
+//    connect(ntwkmgrr,&MainNetworkManger::Message,this,&login::recv);
 }
 
 login::~login()

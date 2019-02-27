@@ -12,7 +12,7 @@ RequestProcesser::RequestProcesser(QObject *parent,QTcpSocket* so) : QObject(par
     this->ToLogin();
 }
 
-void RequestProcesser::send(QString str)
+void RequestProcesser::send(QString str,QString types)
 {
     qDebug() << str.toLatin1().toStdString().c_str();
     socket->write(str.toLatin1() + "\r\n");

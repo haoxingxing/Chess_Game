@@ -20,6 +20,7 @@ private slots:
     void on_logout_clicked();
     void on_maker_clicked();
 private:
+void recv(QVariantMap);
     Ui::menu *ui;
 };
 

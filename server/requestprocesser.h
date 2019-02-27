@@ -8,7 +8,7 @@ class RequestProcesser : public QObject
     Q_OBJECT
 public:
     explicit RequestProcesser(QObject *parent = nullptr,QTcpSocket* so = nullptr);
-    void send(QString str);
+    void send(QString str,QString types);
     //How To :
     QString username;
     void ToLogin();

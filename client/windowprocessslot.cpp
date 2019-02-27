@@ -1,20 +1,20 @@
 #include "windowprocessslot.h"
 
-WindowProcessSlot::WindowProcessSlot(QString name,QWidget *parent,MainNetworkManger* ntwkmgr) : QWidget(parent)
-{
+WindowProcessSlot::WindowProcessSlot(QString name,QWidget *parent,MainNetworkManger* ntwkmgr) : QWidget(parent) {
     ntwkmgrr=ntwkmgr;
     this->name=name;
     connect(ntwkmgrr,&MainNetworkManger::Disconnect,this,&WindowProcessSlot::dscnktd);
     connect(ntwkmgrr,&MainNetworkManger::Message,this,&WindowProcessSlot::recv_t);
 }
 
-void WindowProcessSlot::dscnktd()
-{
+void WindowProcessSlot::dscnktd() {
     this->hide();
     this->deleteLater();
 }
 
 void WindowProcessSlot::recv_t(QVariantMap map)
+{
+    if (map.value("for").toString().contains(name))
 {
     if (map.value("hide").toString().contains(name)||map.value("hide").toString()=="all")
         this->hide();
@@ -25,4 +25,6 @@ void WindowProcessSlot::recv_t(QVariantMap map)
         this->hide();
         this->deleteLater();
     }
+    this->recv(map);
+}
 }

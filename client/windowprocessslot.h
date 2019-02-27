@@ -13,7 +13,8 @@ signals:
     void shide();
     void sshow();
     void sdel();
-
+private:
+    virtual void recv(QVariantMap) = 0;
 public slots:
     virtual void dscnktd();
      void recv_t(QVariantMap);

@@ -9,25 +9,24 @@ chess_place::chess_place(MainNetworkManger *ntwkmgr,QWidget *parent,QVariantMap 
     ui->setupUi(this);
     pan_hei=map.value("rank_info").toString().split("*")[0].toInt();
     pan_wid=map.value("rank_info").toString().split("*")[1].toInt();
-    isyourturn=true;
-    black_or_white=true;
-    isgaming=true;
-    enm=map.value("players").toStringList()[1];
-    this->init_chesses();
-    this->repaint();
-//    for (int i=0;i<map.value("players").toStringList().length();++i)
-//        if (map.value("players").toStringList()[0]==map.value("you").toString()){
-//            enm=map.value("players").toStringList()[1];
-//            black_or_white=true;
-//            isyourturn=true;
-//        } else {
-//            enm=map.value("players").toStringList()[0];
-//            black_or_white=false;
-//            isyourturn=false;
-//        }
-//    if (!(pan_hei>0&&pan_wid>0))
-//        this->dscnktd();
-//    connect(ntwkmgrr,&MainNetworkManger::Message,this,&chess_place::recv);
+//    isyourturn=true;
+//   black_or_white=true;
+//    enm=map.value("players").toStringList()[1];
+//    this->init_chesses();
+//    this->repaint();
+    for (int i=0;i<map.value("players").toStringList().length();++i)
+        if (map.value("players").toStringList()[0]==map.value("you").toString()){
+            enm=map.value("players").toStringList()[1];
+            black_or_white=true;
+            isyourturn=true;
+        } else {
+            enm=map.value("players").toStringList()[0];
+            black_or_white=false;
+            isyourturn=false;
+        }
+    if (!(pan_hei>0&&pan_wid>0))
+        this->dscnktd();
+    //connect(ntwkmgrr,&MainNetworkManger::Message,this,&chess_place::recv);
 }
 
 chess_place::~chess_place()
@@ -39,13 +38,14 @@ void chess_place::recv(QVariantMap map)
 {
     switch (map.value("status").toInt()) {
     case 201:
-        isgaming=true;
+        //isgaming=true;
         this->init_chesses();
         if (isyourturn)
             turn_chess_on();
         else {
             turn_chess_off();
         }
+	isgaming=true;
         this->repaint();
         break;
     case 202:

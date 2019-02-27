@@ -32,10 +32,10 @@ void menu::on_start_clicked()
                                                  })));
 }
 
-//void menu::recv(QVariantMap mp)
-//{
+void menu::recv(QVariantMap mp)
+{
 
-//}
+}
 
 void menu::on_logout_clicked()
 {

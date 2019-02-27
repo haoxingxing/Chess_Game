@@ -10,7 +10,7 @@ Ranking::Ranking(QVariantMap map,QWidget *parent,MainNetworkManger* mnm) :
     all=map.value("numbr").toInt();
     ui->nbs->setText(QString::number(0)+"/"+QString::number(all));
     ui->status->setText("Waiting");
-    connect(ntwkmgrr,&MainNetworkManger::Message,this,&Ranking::recv);
+//    connect(ntwkmgrr,&MainNetworkManger::Message,this,&Ranking::recv);
 }
 
 Ranking::~Ranking()
