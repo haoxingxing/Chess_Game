@@ -7,8 +7,10 @@
 #include <QTcpSocket>
 #include <QObject>
 #include <QTimer>
-#define FM std::make_pair("for","main"),
-#define For(x) std::make_pair("for",x),
+#define MAIN_HEAD "main"
+#define CHESS_HEAD "chess_place"
+#define LOGIN_HEAD "login"
+#define RANK_HEAD "rank"
 namespace Ui {
 class MainNetworkManger;
 }
@@ -20,7 +22,7 @@ class MainNetworkManger : public QWidget
 public:
     explicit MainNetworkManger(QWidget *parent = nullptr);
     ~MainNetworkManger();
-    void send(QString);
+    void send(QVariantMap,QString);
 signals:
     void Message(QVariantMap);
     void Disconnect();

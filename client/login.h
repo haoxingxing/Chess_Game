@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "mainnetworkmanger.h"
 #include "windowprocessslot.h"
+#include "menu.h"
 namespace Ui {
 class login;
 }
@@ -25,6 +26,7 @@ private slots:
     void recv(QVariantMap);
     void on_logi_clicked();
 private:
+    menu *hd = nullptr;
     Ui::login *ui;
 };
 

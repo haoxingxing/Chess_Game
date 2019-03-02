@@ -30,9 +30,10 @@ MainNetworkManger::~MainNetworkManger()
     delete ui;
 }
 
-void MainNetworkManger::send(QString str)
+void MainNetworkManger::send(QVariantMap map,QString head)
 {
-    socket->write(str.toLatin1() + "\r\n");
+    map.insert("for",head);
+    socket->write((Jsoncoder::encode(map) +"\r\n").toLatin1());
     socket->flush();
 }
 
@@ -40,6 +41,8 @@ void MainNetworkManger::Connected()
 {
     tmr_for_timeout.stop();
     ui->status->setText("connected");
+    (new login(this))->show();
+    this->hide();
 }
 
 void MainNetworkManger::ReadyRead()
@@ -48,20 +51,15 @@ void MainNetworkManger::ReadyRead()
     qDebug() << data;
     do{
         QVariantMap map=Jsoncoder::deocde(data);
-        if (map.value("hide").toString().contains("network"))
-            this->hide();
-        if (map.value("show").toString().contains("network"))
-            this->show();
-        if (map.value("close").toString().contains("network"))
-            exit(EXIT_SUCCESS);
-        if (map.value("to").toString()=="login")
-            (new login(this,nullptr))->show();
-        else if (map.value("to").toString()=="menu")
-            (new menu(this,nullptr,map))->show();
-        else if (map.value("to").toString()=="rank")
-            (new Ranking(map,nullptr,this))->show();
-        else if (map.value("to").toString()=="chess_place")
-            (new chess_place(this,nullptr,map))->show();
+        if (map.value("for").toString().contains("network"))
+        {
+            if (map.value("hide").toString().contains("network"))
+                this->hide();
+            if (map.value("show").toString().contains("network"))
+                this->show();
+            if (map.value("close").toString().contains("network"))
+                exit(EXIT_SUCCESS);
+        }
         emit Message(map);
         data.clear();
     }

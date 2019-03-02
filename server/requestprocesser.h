@@ -3,23 +3,20 @@
 
 #include <QObject>
 #include <QTcpSocket>
+#define NETWORK_HEAD "network"
+#define MENU_HEAD "menu"
+#define CHESS_HEAD "chess_place"
+#define LOGIN_HEAD "login"
+#define RANK_HEAD "rank"
+class Login;
 class RequestProcesser : public QObject
 {
     Q_OBJECT
 public:
     explicit RequestProcesser(QObject *parent = nullptr,QTcpSocket* so = nullptr);
-    void send(QString str,QString types);
-    //How To :
-    QString username;
-    void ToLogin();
-    void SendLoginErrorMessage();
-    void SendLoginSuccessMessage();
-    enum LoginType{
-        LOGIN,
-        REGISTER
-    };
-    void Logout();
-    void LoginProcess(QVariantMap map,LoginType tp);
+    void send(QVariantMap str,QString _for);
+    Login* verify;
+
 signals:
     void Message(QVariantMap);
     void dscnktd();
@@ -27,8 +24,6 @@ public slots:
     void readyRead();
 private:
     QTcpSocket* socket;
-
-    bool isLogin = false;
 };
 
 #endif // REQUESTPROCESSER_H

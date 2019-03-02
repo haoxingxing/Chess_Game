@@ -16,6 +16,15 @@
   <property name="autoFillBackground">
    <bool>true</bool>
   </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QPushButton" name="exit">
+     <property name="text">
+      <string>EXIT</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

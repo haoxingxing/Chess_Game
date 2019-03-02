@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "windowprocessslot.h"
 #include "mainnetworkmanger.h"
+#include "chess_place_info.h"
 #include <QPainter>
 #include <QPushButton>
 namespace Ui {
@@ -15,29 +16,45 @@ class chess_place : public WindowProcessSlot
     Q_OBJECT
 
 public:
-    explicit chess_place(MainNetworkManger *ntwkmgr,QWidget *parent = nullptr,QVariantMap map = QVariantMap());
+    explicit chess_place(MainNetworkManger *ntwkmgr,QWidget *parent,int x,int y,QStringList);
     ~chess_place();
 
+signals:
+    void closed();
 private slots:
     void recv(QVariantMap);
-    void dropchess(int x,int y);
 private:
-    void paintEvent(QPaintEvent *event);
-    QPushButton* getAnewChess();
+    struct chess{
+    public:
+        chess(chess_place*);
+        QString whose;
+        bool iscovered = false;
+        QPushButton* pushbutton;
+    };
+    enum colors{
+        WHITE,
+        BLACK
+    };
+    void turn_chess_enable(int x,int y,bool isenable);
+    void turn_chesses_enable(bool isenable);
+    void set_chess_color(int x,int y,colors);
     void init_chesses();
-    void get_all_chesses();
-    void turn_chess_off();
-    void turn_chess_on();
-    void drp(int x,int y,bool bow);
+    void delete_chesses();
+
+    void sendClientReady(QStringList);
+    void sendChessDropped(int x,int y);
+
+    void paintEvent(QPaintEvent*);
+    int xlen,ylen;
+    bool hasinitted=false;
     Ui::chess_place *ui;
-    int pan_hei;
-    int pan_wid;
-    QVector<QVector<QPushButton*>> chesses;
-    QVector<QVector<bool>> chesses_status;
-    QString enm;
-    bool isgaming=false;
-    bool black_or_white;
-    bool isyourturn=false;
+    QString my_username,enm_username;
+    QVector<QVector<chess*>> chesses;
+    colors my,enm;
+    bool ismyturn;
+    QStringList plrlst;
+
+    chess_place_info *info;
 };
 
 #endif // CHESS_PLACE_H

@@ -33,7 +33,8 @@ SOURCES += \
     windowprocessslot.cpp \
     chess_place.cpp \
     ranking.cpp \
-    loading.cpp
+    loading.cpp \
+    chess_place_info.cpp
 
 HEADERS += \
         mainnetworkmanger.h \
@@ -43,7 +44,8 @@ HEADERS += \
     windowprocessslot.h \
     chess_place.h \
     ranking.h \
-    loading.h
+    loading.h \
+    chess_place_info.h
 
 FORMS += \
         mainnetworkmanger.ui \
@@ -51,7 +53,8 @@ FORMS += \
     menu.ui \
     chess_place.ui \
     ranking.ui \
-    loading.ui
+    loading.ui \
+    chess_place_info.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

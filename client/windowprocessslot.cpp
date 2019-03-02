@@ -15,16 +15,16 @@ void WindowProcessSlot::dscnktd() {
 void WindowProcessSlot::recv_t(QVariantMap map)
 {
     if (map.value("for").toString().contains(name))
-{
-    if (map.value("hide").toString().contains(name)||map.value("hide").toString()=="all")
-        this->hide();
-    if (map.value("show").toString().contains(name)||map.value("show").toString()=="all")
-        this->show();
-    if (map.value("close").toString().contains(name)||map.value("close").toString()=="all")
     {
-        this->hide();
-        this->deleteLater();
+        this->recv(map);
+        if (map.value("hide").toString().contains(name)||map.value("hide").toString()=="all")
+            this->hide();
+        if (map.value("show").toString().contains(name)||map.value("show").toString()=="all")
+            this->show();
+        if (map.value("close").toString().contains(name)||map.value("close").toString()=="all")
+        {
+            this->hide();
+            this->deleteLater();
+        }
     }
-    this->recv(map);
-}
 }

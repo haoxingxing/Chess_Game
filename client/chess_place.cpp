@@ -2,31 +2,27 @@
 #include "jsoncoder.h"
 #include "ui_chess_place.h"
 
-chess_place::chess_place(MainNetworkManger *ntwkmgr,QWidget *parent,QVariantMap map) :
+#include <QPaintEvent>
+#include <QMessageBox>
+chess_place::chess_place(MainNetworkManger *ntwkmgr,QWidget *parent,int x,int y,QStringList plrlst) :
     WindowProcessSlot ("chess_place",parent,ntwkmgr),
-    ui(new Ui::chess_place)
+    xlen(x),
+    ylen(y),
+    ui(new Ui::chess_place),
+    plrlst(plrlst)
 {
     ui->setupUi(this);
-    pan_hei=map.value("rank_info").toString().split("*")[0].toInt();
-    pan_wid=map.value("rank_info").toString().split("*")[1].toInt();
-//    isyourturn=true;
-//   black_or_white=true;
-//    enm=map.value("players").toStringList()[1];
-//    this->init_chesses();
-//    this->repaint();
-    for (int i=0;i<map.value("players").toStringList().length();++i)
-        if (map.value("players").toStringList()[0]==map.value("you").toString()){
-            enm=map.value("players").toStringList()[1];
-            black_or_white=true;
-            isyourturn=true;
-        } else {
-            enm=map.value("players").toStringList()[0];
-            black_or_white=false;
-            isyourturn=false;
-        }
-    if (!(pan_hei>0&&pan_wid>0))
-        this->dscnktd();
-    //connect(ntwkmgrr,&MainNetworkManger::Message,this,&chess_place::recv);
+    ui->exit->hide();
+    connect(ui->exit,&QPushButton::clicked,this,[&]{
+        this->hide();
+        this->deleteLater();
+        emit closed();
+    });
+    ntwkmgrr->send(QVariantMap({
+                                   std::make_pair("request","chess_place"),
+                                   std::make_pair("x",25),
+                                   std::make_pair("y",25),
+                               }),MAIN_HEAD);
 }
 
 chess_place::~chess_place()
@@ -34,149 +30,195 @@ chess_place::~chess_place()
     delete ui;
 }
 
+
 void chess_place::recv(QVariantMap map)
 {
     switch (map.value("status").toInt()) {
+    case 200:
+        info=new chess_place_info(this);
+        info->show();
+        info->AppenedMsg("Waiting For Server");
+        this->sendClientReady(plrlst);
+        break;
     case 201:
-        //isgaming=true;
-        this->init_chesses();
-        if (isyourturn)
-            turn_chess_on();
-        else {
-            turn_chess_off();
+        info->AppenedMsg("Server Ready");
+        info->AppenedMsg("Loading Chesses");
+        this->my_username=map.value("usn").toString();
+        if (my_username==map.value("black")){
+            my=BLACK;
+            enm=WHITE;
         }
-	isgaming=true;
-        this->repaint();
+        else{
+            my=WHITE;
+            enm=BLACK;
+        }
+        init_chesses();
+        info->AppenedMsg("DONE!");
         break;
     case 202:
-        drp(map.value("x").toInt(),map.value("y").toInt(),(map.value("who")==enm)?!black_or_white:black_or_white);
-        if (map.value("who")==enm){
-            isyourturn=true;
-            turn_chess_on();
-        }
-        else {
-            isyourturn=false;
-            turn_chess_off();
-        }
+        info->AppenedMsg("Set Chess:");
+        info->AppenedMsg("x: "+QString::number(map.value("x").toInt()));
+        info->AppenedMsg("y: "+QString::number(map.value("y").toInt()));
+        info->AppenedMsg("By: "+map.value("who").toString());
+        set_chess_color(map.value("x").toInt(),map.value("y").toInt(),(map.value("who")==my_username)?my:enm);
         break;
     case 203:
-        for (int x=0;x<=pan_wid;++x)
-            for (int y=0;y<=pan_hei;++y)
-                if (map.value(QString::number(x)+"*"+QString::number(y))!="")
-                    drp(x,y,map.value(QString::number(x)+"*"+QString::number(y))==enm?!black_or_white:black_or_white);
-        break;
+        info->AppenedMsg("Game Over: ""Your competitor has been offline");
+        //QMessageBox::information(this,"Game Over","Your competitor has been offline",QMessageBox::Ok);
+        goto close;
+    case 204:
+        info->AppenedMsg("Game Over: ""Server Force Close");
+        //QMessageBox::information(this,"Game Over","Server Force Close",QMessageBox::Ok);
+        goto close;
+    case 205:
+        info->AppenedMsg("Game Over: "+map.value("winner").toString()+" is the winner");
+        //QMessageBox::information(this,"Game Over",map.value("winner").toString()+" is the winner",QMessageBox::Ok);
+        goto close;
+    }
+    if (hasinitted){
+        if (map.value("nowhosturn").toString()==my_username)
+            ismyturn=true;
+        else
+            ismyturn=false;
+        info->AppenedMsg("Now is "+(!ismyturn?map.value("nowhosturn").toString()+"'s":"your")+" turn");
+        turn_chesses_enable(ismyturn);
+    }
+    return;
+close:
+    this->delete_chesses();
+    repaint();
+    ui->exit->show();
+}
+
+void chess_place::turn_chess_enable(int x, int y, bool isenable)
+{
+    if (hasinitted)
+    {
+        if (!chesses[x][y]->iscovered)
+            chesses[x][y]->pushbutton->setEnabled(isenable);
+        chesses[x][y]->pushbutton->show();
     }
 }
 
-void chess_place::dropchess(int x, int y)
+void chess_place::turn_chesses_enable(bool isenable)
 {
-    if (isgaming)
+    for (int x=0;x<=xlen;++x)
     {
-        ntwkmgrr->send(Jsoncoder::encode(QVariantMap({
-                                                         For("chess_place")
-                                                         std::make_pair("action","drop"),
-                                                         std::make_pair("x",x),
-                                                         std::make_pair("y",y)
-                                                     })));
-    }
-}
-
-void chess_place::paintEvent(QPaintEvent*)
-{
-    if (isgaming)
-    {
-        QPainter ptr(this);
-        int screen_wid=this->width();
-        int screen_hei=this->height();
-        if (!(screen_hei>=pan_hei*10&&screen_wid>=pan_wid*10))
-            resize(pan_wid*10,pan_hei*10);
-        int per_ge_wid=screen_wid / pan_wid;
-        int per_ge_hei=screen_hei / pan_hei;
-        int screen_left_wid=screen_wid % per_ge_wid;
-        int screen_left_hei=screen_hei % per_ge_hei;
-        int screen_left_left_right=screen_left_wid/2;
-        int screen_left_up_down=screen_left_hei/2;
-        for (int i=0;i<=pan_wid;++i) {
-            ptr.drawLine(screen_left_left_right+per_ge_wid*i,screen_left_up_down,screen_left_left_right+per_ge_wid*i,screen_left_up_down+per_ge_hei*pan_hei);
+        for (int y=0;y<=ylen;++y)
+        {
+            turn_chess_enable(x,y,isenable);
         }
-        for (int i=0;i<=pan_hei;++i) {
-            ptr.drawLine(screen_left_left_right,screen_left_up_down+per_ge_hei*i,screen_left_left_right+per_ge_wid*pan_wid,screen_left_up_down+per_ge_hei*i);
-        }
-        for (int x=0;x<=pan_wid;++x)
-            for(int y=0;y<=pan_hei;++y)
-            {
-                chesses[x][y]->setGeometry(screen_left_left_right+per_ge_wid*x-(per_ge_wid/2),screen_left_up_down+per_ge_hei*y-(per_ge_hei/2),per_ge_wid,per_ge_hei);
-            }
     }
-}
-QPushButton* chess_place::getAnewChess()
-{
-    QPushButton* pb=new QPushButton("",this);
-    pb->setFlat(true);
-    pb->setText("0");
-    pb->setGeometry(0,0,0,0);
-    //pb->setAutoFillBackground(true);
-    return pb;
 }
 
 void chess_place::init_chesses()
 {
-    for (int x=0;x<=pan_wid;++x)
+    for (int x=0;x<=xlen;++x)
     {
-        chesses.insert(x,QVector<QPushButton*>());
-        chesses_status.insert(x,QVector<bool>());
-        for(int y=0;y<=pan_hei;++y)
+        chesses.push_back(QVector<chess_place::chess*>());
+        for (int y=0;y<=ylen;++y)
         {
-            chesses_status[x].insert(y,false);
-            chesses[x].insert(y,getAnewChess());
-            //            connect(chesses[x][y],&QPushButton::clicked,this,[&]{
-            //                this->dropchess(x,y);
-            //            });
+            chesses[x].push_back(new chess(this));
+            connect(chesses[x][y]->pushbutton,&QPushButton::clicked,this,[=]{
+                this->sendChessDropped(x,y);
+            });
+        }
+    }
+    hasinitted=true;
+}
+
+void chess_place::delete_chesses()
+{
+    hasinitted=false;
+    for (int x=0;x<=xlen;++x)
+    {
+        for (int y=0;y<=ylen;++y)
+        {
+            if (!chesses[x][y]->iscovered)
+                delete chesses[x][y]->pushbutton;
         }
     }
 }
 
-void chess_place::get_all_chesses()
+void chess_place::sendClientReady(QStringList PLRLST)
 {
-    ntwkmgrr->send(Jsoncoder::encode(QVariantMap({
-                                                     For("chess_place")
-                                                     std::make_pair("action","get_all")
-                                                 })));
+    ntwkmgrr->send(QVariantMap({
+                                   std::make_pair("status",101),
+                                   std::make_pair("players",PLRLST)
+                               }),CHESS_HEAD);
+    info->AppenedMsg("client ready");
 }
 
-void chess_place::turn_chess_off()
+void chess_place::sendChessDropped(int x, int y)
 {
-    for (int x=0;x<=pan_wid;++x)
-        for(int y=0;y<=pan_hei;++y)
-        {
-            if (!chesses_status[x][y])
-            {
-                chesses[x][y]->setEnabled(false);
-            }
+    ntwkmgrr->send(QVariantMap({
+                                   std::make_pair("status",102),
+                                   std::make_pair("x",x),
+                                   std::make_pair("y",y),
+                               }),CHESS_HEAD);
+    info->AppenedMsg("Request has sent");
+}
+
+void chess_place::set_chess_color(int x, int y, chess_place::colors cls)
+{
+    if (hasinitted)
+    {
+        QString sht;
+        switch (cls) {
+        case WHITE:
+            sht="background-color: rgb(255, 255, 255);";
+            break;
+        case BLACK:
+            sht="background-color: rgb(0, 0, 0);";
+            break;
         }
-}
-
-void chess_place::turn_chess_on()
-{
-    for (int x=0;x<=pan_wid;++x)
-        for(int y=0;y<=pan_hei;++y)
-        {
-            if (!chesses_status[x][y])
-            {
-                chesses[x][y]->setEnabled(true);
-            }
-        }
-}
-
-void chess_place::drp(int x, int y, bool bow)
-{
-    chesses[x][y]->setEnabled(false);
-    if (bow){
-        chesses_status[x][y]=true;
-        chesses[x][y]->setStyleSheet("background-color: rgb(0, 0, 0);");
-    } else {
-        chesses_status[x][y]=true;
-        chesses[x][y]->setStyleSheet("background-color: rgb(255, 255, 255);");
+        turn_chess_enable(x,y,false);
+        chesses[x][y]->iscovered=true;
+        chesses[x][y]->pushbutton->setStyleSheet(sht);
+        chesses[x][y]->pushbutton->setAutoFillBackground(true);
+        chesses[x][y]->pushbutton->show();
     }
 }
 
+
+void chess_place::paintEvent(QPaintEvent*)
+{
+
+    QPainter ptr(this);
+    int screen_wid=this->width();
+    int screen_hei=this->height();
+    if (!(screen_hei>=ylen*10&&screen_wid>=xlen*10))
+        resize(xlen*30,ylen*30);
+    int per_ge_wid=screen_wid / xlen;
+    int per_ge_hei=screen_hei / ylen;
+    int screen_left_wid=screen_wid % per_ge_wid;
+    int screen_left_hei=screen_hei % per_ge_hei;
+    int screen_left_left_right=screen_left_wid/2;
+    int screen_left_up_down=screen_left_hei/2;
+    for (int i=0;i<=xlen;++i) {
+        ptr.drawLine(screen_left_left_right+per_ge_wid*i,screen_left_up_down,screen_left_left_right+per_ge_wid*i,screen_left_up_down+per_ge_hei*ylen);
+    }
+    for (int i=0;i<=ylen;++i) {
+        ptr.drawLine(screen_left_left_right,screen_left_up_down+per_ge_hei*i,screen_left_left_right+per_ge_wid*xlen,screen_left_up_down+per_ge_hei*i);
+    }
+    if (hasinitted)
+    {
+        for (int x=0;x<=xlen;++x)
+        {
+            for (int y=0;y<=ylen;++y)
+            {
+                chesses[x][y]->pushbutton->setGeometry(screen_left_left_right+per_ge_wid*x-(per_ge_wid/2),screen_left_up_down+per_ge_hei*y-(per_ge_hei/2),per_ge_wid,per_ge_hei);
+                chesses[x][y]->pushbutton->show();
+            }
+        }
+    }
+}
+
+
+
+chess_place::chess::chess(chess_place* window){
+    pushbutton=new QPushButton("",window);
+    pushbutton->setFlat(true);
+    pushbutton->show();
+
+}

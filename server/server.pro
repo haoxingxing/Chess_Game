@@ -22,7 +22,9 @@ SOURCES += \
     requestprocesser.cpp \
     login.cpp \
     chess_gaming.cpp \
-    ranking.cpp
+    ranking.cpp \
+    rqstprcs.cpp
+
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -35,4 +37,5 @@ HEADERS += \
     requestprocesser.h \
     login.h \
     chess_gaming.h \
-    ranking.h
+    ranking.h \
+    rqstprcs.h

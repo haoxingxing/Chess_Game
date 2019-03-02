@@ -12,14 +12,17 @@ class Ranking : public WindowProcessSlot
     Q_OBJECT
 
 public:
-    explicit Ranking(QVariantMap startup,QWidget *parent = nullptr,MainNetworkManger* mnm = nullptr);
+    explicit Ranking(MainNetworkManger* mnm = nullptr,QWidget *parent = nullptr,int allnbers=0);
     ~Ranking();
 public slots:
     void recv(QVariantMap);
+signals:
+    void fulled(QStringList);
 private slots:
     void on_exit_clicked();
 
 private:
+    void SendJoin();
     Ui::Ranking *ui;
     int all;
 };

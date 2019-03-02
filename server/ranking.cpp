@@ -1,84 +1,105 @@
 #include "jsoncoder.h"
 #include "ranking.h"
 #include <QDebug>
+#include "login.h"
 #include <qthread.h>
 #include "chess_gaming.h"
-ranking::ranking(QObject *parent,RequestProcesser* mnm,int n,QString _username,QString rank_info,QString to) : QObject(parent),nb(n),username(_username),ntwkmgr(mnm)
+ranking::ranking(RequestProcesser* mnm,int n,QString rank_info) : RQSTPRCS (RANK_HEAD,mnm),nb(n)
 {    
     rkif=rank_info;
     this->SendRankStartInfo();
-    this->to=to;
     rkn=new rank_node(this,nb,rank_info);
     connect(rkn,&rank_node::fulled,this,&ranking::SendFulled);
     connect(rkn,&rank_node::number_changed,this,&ranking::SendValueChanged);
-    connect(ntwkmgr,&RequestProcesser::Message,this,&ranking::recvs);
     connect(ntwkmgr,&RequestProcesser::dscnktd,this,[&]{
-        rkn->del(username);
+        rkn->del(ntwkmgr->verify->username);
     });
-    if (!this->Join())
-        this->SendJoinRankFailedInfo();
 }
+
+/* Some codes
+ * recv:
+ *      101: exit
+ *      102: join
+ * send:
+ *      100: join failed
+ *      101: rank fulled
+ *      102: rank started
+ *      103: rank list changed
+ *      104: joined
+*/
 
 void ranking::SendRankStartInfo()
 {
-    ntwkmgr->send(Jsoncoder::encode(QVariantMap({
-                                                    std::make_pair("to","rank"),
-                                                    std::make_pair("numbr",nb),
-                                                    std::make_pair("close","menu"),
-                                                })));
+    ntwkmgr->send(QVariantMap({
+                                  std::make_pair("status",102)
+                              }),MENU_HEAD);
 }
 
 void ranking::SendJoinRankFailedInfo()
 {
-    ntwkmgr->send(Jsoncoder::encode(QVariantMap({
-                                                    std::make_pair("status",100)
-                                                })));
+    ntwkmgr->send(QVariantMap({
+                                  std::make_pair("status",100)
+                              }),RANK_HEAD);
 }
 
 void ranking::SendValueChanged(int now,QStringList list)
 {
-    ntwkmgr->send(Jsoncoder::encode(QVariantMap({
-                                                    std::make_pair("nnb",now),
-                                                    std::make_pair("list",list)
-                                                })));
+    ntwkmgr->send(QVariantMap({
+                                  std::make_pair("status",103),
+                                  std::make_pair("nnb",now),
+                                  std::make_pair("list",list)
+                              }),RANK_HEAD);
+}
+void ranking::SendFulled(QStringList strlist)
+{
+
+    ntwkmgr->send(QVariantMap({
+                                  std::make_pair("status",101),
+                                  std::make_pair("players",strlist),
+                              }),RANK_HEAD);
+    this->deleteLater();
+}
+void ranking::recv(QVariantMap map)
+{
+    switch (map.value("status").toInt()) {
+     case 101:
+        rkn->del(ntwkmgr->verify->username);
+        ntwkmgr->send(QVariantMap({
+                                      std::make_pair("status",105),
+                                  }),RANK_HEAD);
+        ntwkmgr->send(QVariantMap({
+                                      std::make_pair("status",103),
+                                  }),MENU_HEAD);
+        this->deleteLater();
+        break;
+    case 102:
+        if (!this->Join())
+            SendJoinRankFailedInfo();
+        else
+            SendJoined();
+        break;
+    }
+}
+
+void ranking::dscnktd()
+{
+    rkn->del(ntwkmgr->verify->username);
+    this->deleteLater();
 }
 
 bool ranking::Join()
 {
-    return rkn->join(username);
+    return rkn->join(ntwkmgr->verify->username);
 }
 
-
-void ranking::SendFulled(QStringList strlist)
+void ranking::SendJoined()
 {
-
-    ntwkmgr->send(Jsoncoder::encode(QVariantMap({
-                                                    std::make_pair("close","rank"),
-                                                    std::make_pair("to",to),
-                                                    std::make_pair("players",strlist),
-                                                    std::make_pair("you",username),
-                                                    std::make_pair("rank_info",rkif)
-                                                })));
-    new chess_gaming(strlist,rkif,ntwkmgr,ntwkmgr);
-    this->deleteLater();
+    ntwkmgr->send(QVariantMap({
+                                  std::make_pair("status",104),
+                              }),RANK_HEAD);
 }
 
-void ranking::recvs(QVariantMap map)
-{
-    if (map.value("for").toString()=="rank")
-    {
-        if (map.value("action")=="exit")
-        {
-            rkn->del(username);
-            ntwkmgr->send(Jsoncoder::encode(QVariantMap({
-                                                   std::make_pair("to","menu"),
-                                                   std::make_pair("username",username),
-                                                   std::make_pair("close","rank")
-                                               })));
-            this->deleteLater();
-        }
-    }
-}
+
 
 rank_node::rank_node(QObject *parent, int n,QString rank_info) : QObject (parent),nb(n),rkif(rank_info){
     connect(&tm_ch_sg,&QTimer::timeout,this,&rank_node::check_full);
@@ -88,7 +109,7 @@ rank_node::rank_node(QObject *parent, int n,QString rank_info) : QObject (parent
 bool rank_node::join(QString username)
 {       
     if (!isranking)
-    {        
+    {
         if (rn[QString::number(nb)+"*"+rkif].now!=nb)
         {
             check_full();
@@ -151,9 +172,9 @@ void rank_node::check_full()
                     emit fulled(rn[QString::number(nb)+"*"+rkif].user_list);
                     rn[QString::number(nb)+"*"+rkif].fulledSiganlSended++;
                 }
-            }            
+            }
         }
-    }    
+    }
 }
 
 QMap<QString,rank_node::Rank_Node> rank_node::rn = QMap<QString,rank_node::Rank_Node>();

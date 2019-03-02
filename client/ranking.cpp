@@ -2,15 +2,15 @@
 #include "ranking.h"
 #include "ui_ranking.h"
 
-Ranking::Ranking(QVariantMap map,QWidget *parent,MainNetworkManger* mnm) :
+Ranking::Ranking(MainNetworkManger* mnm,QWidget *parent,int nb) :
     WindowProcessSlot ("rank",parent,mnm),
-    ui(new Ui::Ranking)
+    ui(new Ui::Ranking),
+    all(nb)
 {
     ui->setupUi(this);
-    all=map.value("numbr").toInt();
-    ui->nbs->setText(QString::number(0)+"/"+QString::number(all));
-    ui->status->setText("Waiting");
-//    connect(ntwkmgrr,&MainNetworkManger::Message,this,&Ranking::recv);
+    ui->nbs->setText(QString::number(1)+"/"+QString::number(all));
+    ui->status->setText("Joining");
+    this->SendJoin();
 }
 
 Ranking::~Ranking()
@@ -20,23 +20,39 @@ Ranking::~Ranking()
 
 void Ranking::recv(QVariantMap map)
 {
-    if (map.value("status")==100)
+    switch (map.value("status").toInt())
     {
-            ui->status->setText("The Rank List is Fulled,Retrying");
-            ntwkmgrr->send(Jsoncoder::encode(QVariantMap({
-                                                             FM
-                                                          std::make_pair("type","rank"),
-                                                          std::make_pair("numbers",all),
-                                                         })));
+    case 100:
+        ui->status->setText("The Rank List is Fulled,Retrying");
+        this->SendJoin();
+        break;
+    case 101:
+        emit fulled(map.value("players").toStringList());
+        this->dscnktd();
+        break;
+    case 103:
+        ui->nbs->setText(QString::number(map.value("nnb").toInt())+"/"+QString::number(all));
+        ui->plrlst->setText("\""+map.value("list").toStringList().join("\",\"")+"\"");
+        break;
+    case 104:
+        ui->status->setText("Joined * Waiting");
+        break;
+    case 105:
+        this->dscnktd();
     }
 
-    ui->nbs->setText(QString::number(map.value("nnb").toInt())+"/"+QString::number(all));
-    ui->plrlst->setText("\""+map.value("list").toStringList().join("\",\"")+"\"");
+
 }
 void Ranking::on_exit_clicked()
 {
-    ntwkmgrr->send(Jsoncoder::encode(QVariantMap({
-                                                  For("rank")
-                                                  std::make_pair("action","exit"),
-                                              })));
+    ntwkmgrr->send(QVariantMap({
+                                                     std::make_pair("status",101),
+                                                 }),RANK_HEAD);
+}
+
+void Ranking::SendJoin()
+{
+    ntwkmgrr->send(QVariantMap({
+                                                     std::make_pair("status",102),
+                                                 }),RANK_HEAD);
 }

@@ -1,44 +1,105 @@
 #include "chess_gaming.h"
 #include "jsoncoder.h"
+#include "login.h"
+QMap<QString,chess_gaming::a_game> chess_gaming::games = QMap<QString,chess_gaming::a_game>();
 
-QMap<QString,a_game> games = QMap<QString,a_game>();
-
-chess_gaming::chess_gaming(QStringList plrlst,QString ifo,QObject *parent,RequestProcesser* mnm) :
-    QObject(parent),
-    ntwkmgr(mnm)
+chess_gaming::chess_gaming(RequestProcesser*parent,int x,int y) :
+    RQSTPRCS(CHESS_HEAD,parent),
+    xlen(x),
+    ylen(y)
 {
-    pan_w=ifo.split("*")[0].toInt();
-    pan_h=ifo.split("*")[1].toInt();
-    connect(ntwkmgr,&RequestProcesser::Message,this,&chess_gaming::recv_process);
-    connect(ntwkmgr,&RequestProcesser::dscnktd,this,[&]{
-
-    });
-    username=ntwkmgr->username;
-    connect(&tm_fr_chk_rdr,&QTimer::timeout,this,&chess_gaming::checkReady);
-    tm_fr_chk_rdr.start(1000);
-    createGame(plrlst);
+    connect(this,&chess_gaming::chesschanged,this,&chess_gaming::sendChessChanged);
+    ntwkmgr->send(QVariantMap({
+                                  std::make_pair("status",200)
+                              }),CHESS_HEAD);
 }
 
-void chess_gaming::recv_process(QVariantMap map)
+chess_gaming::~chess_gaming()
 {
-    if (map.value("for").toString()=="chess_place")
+    games.remove(game_id);
+}
+/*
+ * Some codes
+ * recv:
+ *      101: client ready
+ *      102: drop chess
+ * send:
+ *      200: server start
+ *      201: server ready
+ *      202: chess changed
+ *      203: client disconnected
+ *      204: force game over
+ *      205: game winner appeared
+*/
+void chess_gaming::recv(QVariantMap map)
+{
+    switch(map.value("status").toInt()){
+    case 101:
     {
-        if (map.value("action")=="get_all")
-        {
-            QVariantMap map;
-            for (int x=0;x<=games[game_id].pan.length();++x)
-                for (int y=0;y<=games[game_id].pan[x].length();++y)
-                {
-                    map.insert(QString::number(x)+"*"+QString::number(y),games[game_id].pan[x][y].who);
-                }
-            map.insert("status",203);
-            ntwkmgr->send(Jsoncoder::encode(map));
-        }
-        if (map.value("action")=="drop")
-        {
-            dropchess(map.value("x").toInt(),map.value("y").toInt());
-        }
+        createGame(map.value("players").toStringList());
+        break;
     }
+    case 102:
+        dropchess(map.value("x").toInt(),map.value("y").toInt());
+        break;
+    }
+
+}
+void chess_gaming::sendChessChanged(int x, int y)
+{
+    ntwkmgr->send(QVariantMap({
+                                  std::make_pair("status",202),
+                                  std::make_pair("x",x),
+                                  std::make_pair("y",y),
+                                  std::make_pair("who",games[game_id].pan[size_t(x)+5][size_t(y)+5].who),
+                                  std::make_pair("nowhosturn",games[game_id].now_whos_turn)
+                              }),CHESS_HEAD);
+    this->checkwinner();
+}
+
+void chess_gaming::sendGameEnd()
+{
+    ntwkmgr->send(QVariantMap({
+                                  std::make_pair("status",204),
+                              }),CHESS_HEAD);
+    this->deleteLater();
+}
+
+void chess_gaming::sendGameWinner()
+{
+    ntwkmgr->send(QVariantMap({
+                                  std::make_pair("status",205),
+                                  std::make_pair("winner",games[game_id].winner)
+                              }),CHESS_HEAD);
+    this->deleteLater();
+}
+
+void chess_gaming::sendReadyed()
+{
+    isgaming=true;
+    ntwkmgr->send(QVariantMap({
+                                  std::make_pair("status",201),
+                                  std::make_pair("white",games[game_id].first),
+                                  std::make_pair("black",games[game_id].second),
+                                  std::make_pair("usn",ntwkmgr->verify->username),
+                                  std::make_pair("nowhosturn",games[game_id].now_whos_turn)
+                              }),CHESS_HEAD);
+}
+
+
+void chess_gaming::dscnktd()
+{
+    if (isgaming){
+        this->forceRestGame();
+    }
+
+}
+
+void chess_gaming::sendDisconnected()
+{
+    ntwkmgr->send(QVariantMap({
+                                  std::make_pair("status",203),
+                              }),CHESS_HEAD);
 }
 
 void chess_gaming::createGame(QStringList gamers)
@@ -49,42 +110,141 @@ void chess_gaming::createGame(QStringList gamers)
         games.insert(game_id,a_game());
         games[game_id].first=gamers[0];
         games[game_id].second=gamers[1];
-        games[game_id].isgaming=false;
+        if (gamers[0]==ntwkmgr->verify->username)
+        {
+            games[game_id].first_add=this;
+        }
+        else {
+            games[game_id].second_add=this;
+        }
     }
     else {
-        games[game_id].isgaming=true;
-        sendReadyed();
+        if (gamers[0]==ntwkmgr->verify->username)
+        {
+            games[game_id].first_add=this;
+        }
+        else {
+            games[game_id].second_add=this;
+        }
+        games[game_id].now_whos_turn=games[game_id].first;
+        init_place();
+        connect(games[game_id].first_add,&chess_gaming::chesschanged,games[game_id].second_add,&chess_gaming::sendChessChanged);
+        connect(games[game_id].second_add,&chess_gaming::chesschanged,games[game_id].first_add,&chess_gaming::sendChessChanged);
+        games[game_id].first_add->sendReadyed();
+        games[game_id].second_add->sendReadyed();
     }
 }
 
-void chess_gaming::sendReadyed()
-{
-    tm_fr_chk_rdr.stop();
-    ntwkmgr->send(Jsoncoder::encode(QVariantMap({
-                                           std::make_pair("status",201),
-                                                })));
-}
 
 void chess_gaming::dropchess(int x, int y)
 {
-    if (games[game_id].pan[x][y].who==""){
-        games[game_id].pan[x][y].who=username;
-        this->sendChessChanged(x,y);
+    if (games[game_id].now_whos_turn==ntwkmgr->verify->username)
+        if (games[game_id].pan[size_t(x)+5][size_t(y)+5].who==""){
+            games[game_id].pan[size_t(x)+5][size_t(y)+5].who=ntwkmgr->verify->username;
+            games[game_id].now_whos_turn=(games[game_id].now_whos_turn==games[game_id].first)?games[game_id].second:games[game_id].first;
+            emit chesschanged(x,y);
+        }
+}
+
+void chess_gaming::checkwinner()
+{
+    if (isgaming)
+    {
+        for(size_t x=5;x<games[game_id].pan.size()-5;++x)
+        {
+            for (size_t y=5;y<games[game_id].pan[x].size()-5;++y) {
+                if (games[game_id].pan[x][y].who==games[game_id].first&&games[game_id].pan[x+1][y].who==games[game_id].first&&games[game_id].pan[x+2][y].who==games[game_id].first&&games[game_id].pan[x+3][y].who==games[game_id].first&&games[game_id].pan[x+4][y].who==games[game_id].first){
+                    games[game_id].winner=games[game_id].first;
+                    goto has_winner;
+                }
+                else if (games[game_id].pan[x][y].who==games[game_id].first&&games[game_id].pan[x-1][y].who==games[game_id].first&&games[game_id].pan[x-2][y].who==games[game_id].first&&games[game_id].pan[x-3][y].who==games[game_id].first&&games[game_id].pan[x-4][y].who==games[game_id].first){
+                    games[game_id].winner=games[game_id].first;
+                    goto has_winner;
+                }
+                else if (games[game_id].pan[x][y+1].who==games[game_id].first&&games[game_id].pan[x][y+2].who==games[game_id].first&&games[game_id].pan[x][y+3].who==games[game_id].first&&games[game_id].pan[x][y+4].who==games[game_id].first&&games[game_id].pan[x][y].who==games[game_id].first){
+                    games[game_id].winner=games[game_id].first;
+                    goto has_winner;
+                }
+                else if (games[game_id].pan[x][y-1].who==games[game_id].first&&games[game_id].pan[x][y-2].who==games[game_id].first&&games[game_id].pan[x][y-3].who==games[game_id].first&&games[game_id].pan[x][y-4].who==games[game_id].first&&games[game_id].pan[x][y].who==games[game_id].first){
+                    games[game_id].winner=games[game_id].first;
+                    goto has_winner;
+                }
+                else if (games[game_id].pan[x+1][y+1].who==games[game_id].first&&games[game_id].pan[x+2][y+2].who==games[game_id].first&&games[game_id].pan[x+3][y+3].who==games[game_id].first&&games[game_id].pan[x+4][y+4].who==games[game_id].first&&games[game_id].pan[x][y].who==games[game_id].first){
+                    games[game_id].winner=games[game_id].first;
+                    goto has_winner;
+                }
+                else if (games[game_id].pan[x-1][y-1].who==games[game_id].first&&games[game_id].pan[x-2][y-2].who==games[game_id].first&&games[game_id].pan[x-3][y-3].who==games[game_id].first&&games[game_id].pan[x-4][y-4].who==games[game_id].first&&games[game_id].pan[x][y].who==games[game_id].first){
+                    games[game_id].winner=games[game_id].first;
+                    goto has_winner;
+                }
+                else if (games[game_id].pan[x-1][y+1].who==games[game_id].first&&games[game_id].pan[x-2][y+2].who==games[game_id].first&&games[game_id].pan[x-3][y+3].who==games[game_id].first&&games[game_id].pan[x-4][y+4].who==games[game_id].first&&games[game_id].pan[x][y].who==games[game_id].first){
+                    games[game_id].winner=games[game_id].first;
+                    goto has_winner;
+                }
+                else if (games[game_id].pan[x+1][y-1].who==games[game_id].first&&games[game_id].pan[x+2][y-2].who==games[game_id].first&&games[game_id].pan[x+3][y-3].who==games[game_id].first&&games[game_id].pan[x+4][y-4].who==games[game_id].first&&games[game_id].pan[x][y].who==games[game_id].first){
+                    games[game_id].winner=games[game_id].first;
+                    goto has_winner;
+                }
+                //#
+                if (games[game_id].pan[x][y].who==games[game_id].second&&games[game_id].pan[x+1][y].who==games[game_id].second&&games[game_id].pan[x+2][y].who==games[game_id].second&&games[game_id].pan[x+3][y].who==games[game_id].second&&games[game_id].pan[x+4][y].who==games[game_id].second){
+                    games[game_id].winner=games[game_id].second;
+                    goto has_winner;
+                }
+                else if (games[game_id].pan[x][y].who==games[game_id].second&&games[game_id].pan[x-1][y].who==games[game_id].second&&games[game_id].pan[x-2][y].who==games[game_id].second&&games[game_id].pan[x-3][y].who==games[game_id].second&&games[game_id].pan[x-4][y].who==games[game_id].second){
+                    games[game_id].winner=games[game_id].second;
+                    goto has_winner;
+                }
+                else if (games[game_id].pan[x][y+1].who==games[game_id].second&&games[game_id].pan[x][y+2].who==games[game_id].second&&games[game_id].pan[x][y+3].who==games[game_id].second&&games[game_id].pan[x][y+4].who==games[game_id].second&&games[game_id].pan[x][y].who==games[game_id].second){
+                    games[game_id].winner=games[game_id].second;
+                    goto has_winner;
+                }
+                else if (games[game_id].pan[x][y-1].who==games[game_id].second&&games[game_id].pan[x][y-2].who==games[game_id].second&&games[game_id].pan[x][y-3].who==games[game_id].second&&games[game_id].pan[x][y-4].who==games[game_id].second&&games[game_id].pan[x][y].who==games[game_id].second){
+                    games[game_id].winner=games[game_id].second;
+                    goto has_winner;
+                }
+                else if (games[game_id].pan[x+1][y+1].who==games[game_id].second&&games[game_id].pan[x+2][y+2].who==games[game_id].second&&games[game_id].pan[x+3][y+3].who==games[game_id].second&&games[game_id].pan[x+4][y+4].who==games[game_id].second&&games[game_id].pan[x][y].who==games[game_id].second){
+                    games[game_id].winner=games[game_id].second;
+                    goto has_winner;
+                }
+                else if (games[game_id].pan[x-1][y-1].who==games[game_id].second&&games[game_id].pan[x-2][y-2].who==games[game_id].second&&games[game_id].pan[x-3][y-3].who==games[game_id].second&&games[game_id].pan[x-4][y-4].who==games[game_id].second&&games[game_id].pan[x][y].who==games[game_id].second){
+                    games[game_id].winner=games[game_id].second;
+                    goto has_winner;
+                }
+                else if (games[game_id].pan[x-1][y+1].who==games[game_id].second&&games[game_id].pan[x-2][y+2].who==games[game_id].second&&games[game_id].pan[x-3][y+3].who==games[game_id].second&&games[game_id].pan[x-4][y+4].who==games[game_id].second&&games[game_id].pan[x][y].who==games[game_id].second){
+                    games[game_id].winner=games[game_id].second;
+                    goto has_winner;
+                }
+                else if (games[game_id].pan[x+1][y-1].who==games[game_id].second&&games[game_id].pan[x+2][y-2].who==games[game_id].second&&games[game_id].pan[x+3][y-3].who==games[game_id].second&&games[game_id].pan[x+4][y-4].who==games[game_id].second&&games[game_id].pan[x][y].who==games[game_id].second){
+                    games[game_id].winner=games[game_id].second;
+                    goto has_winner;
+                }
+            }
+        }
+        return;
+has_winner:{
+            this->sendGameWinner();
+        }
     }
 }
 
-void chess_gaming::checkReady()
+void chess_gaming::init_place()
 {
-    if (games[game_id].isgaming)
-        sendReadyed();
+    for (int x=0;x<=xlen+15;++x)
+    {
+        games[game_id].pan.push_back(std::vector<a_game::zi>());
+        for (int y=0;y<=ylen+15;++y)
+        {
+            games[game_id].pan[size_t(x)].push_back(a_game::zi());
+        }
+    }
 }
 
-void chess_gaming::sendChessChanged(int x, int y)
+void chess_gaming::forceRestGame()
 {
-    ntwkmgr->send(Jsoncoder::encode(QVariantMap({
-                                           std::make_pair("status",202),
-                                           std::make_pair("x",x),
-                                           std::make_pair("y",y),
-                                           std::make_pair("who",games[game_id].pan[x][y].who)
-                                                })));
+    if (isgaming){
+        games[game_id].first_add->sendGameEnd();
+        games[game_id].second_add->sendGameEnd();
+        games.remove(game_id);
+    }
 }
+

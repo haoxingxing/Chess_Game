@@ -4,7 +4,7 @@
 #include <QObject>
 #include "requestprocesser.h"
 #include <QTimer>
-
+#include "rqstprcs.h"
 class rank_node : public QObject
 {
     Q_OBJECT
@@ -33,25 +33,25 @@ private:
     int now_in_this_class;
 };
 
-class ranking : public QObject
+class ranking : public RQSTPRCS
 {
     Q_OBJECT
 public:
-    explicit ranking(QObject *parent = nullptr,RequestProcesser* mnm = nullptr,int n=2,QString username="undefine",QString rank_info = "",QString to = "");
-    void SendRankStartInfo();
-    void SendJoinRankFailedInfo();
-    bool Join();
+    explicit ranking(RequestProcesser* mnm = nullptr,int n=2,QString rank_info = "");
+
 public slots:
     void SendValueChanged(int,QStringList);
     void SendFulled(QStringList);
-    void recvs(QVariantMap);
+    void recv(QVariantMap);
+    void SendRankStartInfo();
+    void SendJoinRankFailedInfo();
+    bool Join();
+    void SendJoined();
+    void dscnktd();
 private:
     rank_node *rkn;
     int nb;
-    QString username;
     QString rkif;
-    RequestProcesser* ntwkmgr;
-    QString to;
 };
 
 #endif // RANKING_H
