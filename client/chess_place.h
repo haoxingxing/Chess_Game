@@ -55,6 +55,9 @@ private:
     QStringList plrlst;
 
     chess_place_info *info;
+
+    //tmp vars
+    int per_ge_wid,per_ge_hei,screen_left_wid,screen_left_hei,screen_left_left_right,screen_left_up_down;
 };
 
 #endif // CHESS_PLACE_H

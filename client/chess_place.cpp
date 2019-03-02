@@ -189,12 +189,15 @@ void chess_place::paintEvent(QPaintEvent*)
     int screen_hei=this->height();
     if (!(screen_hei>=ylen*10&&screen_wid>=xlen*10))
         resize(xlen*30,ylen*30);
-    int per_ge_wid=screen_wid / xlen;
-    int per_ge_hei=screen_hei / ylen;
-    int screen_left_wid=screen_wid % per_ge_wid;
-    int screen_left_hei=screen_hei % per_ge_hei;
-    int screen_left_left_right=screen_left_wid/2;
-    int screen_left_up_down=screen_left_hei/2;
+    if (hasinitted)
+    {
+        per_ge_wid=screen_wid / xlen;
+        per_ge_hei=screen_hei / ylen;
+        screen_left_wid=screen_wid % per_ge_wid;
+        screen_left_hei=screen_hei % per_ge_hei;
+        screen_left_left_right=screen_left_wid/2;
+        screen_left_up_down=screen_left_hei/2;
+    }
     for (int i=0;i<=xlen;++i) {
         ptr.drawLine(screen_left_left_right+per_ge_wid*i,screen_left_up_down,screen_left_left_right+per_ge_wid*i,screen_left_up_down+per_ge_hei*ylen);
     }
