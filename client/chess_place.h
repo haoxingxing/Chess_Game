@@ -5,6 +5,7 @@
 #include "windowprocessslot.h"
 #include "mainnetworkmanger.h"
 #include "chess_place_info.h"
+#include "chat.h"
 #include <QPainter>
 #include <QPushButton>
 namespace Ui {
@@ -55,7 +56,7 @@ private:
     QStringList plrlst;
 
     chess_place_info *info;
-
+    chat* chat_window;
     //tmp vars
     int per_ge_wid,per_ge_hei,screen_left_wid,screen_left_hei,screen_left_left_right,screen_left_up_down;
 };

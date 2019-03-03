@@ -5,6 +5,19 @@
 #include "requestprocesser.h"
 #include <QTimer>
 #include "rqstprcs.h"
+
+/* Request Respone
+ * recv:
+ *      101: exit {}
+ *      102: join {}
+ * send:
+ *      100: join failed {}
+ *      101: rank fulled {+players(QStringList)}
+ *      102: rank started {}
+ *      103: rank list changed {+nnb(int) +list(QStringList)}
+ *      104: joined {}
+*/
+
 class rank_node : public QObject
 {
     Q_OBJECT

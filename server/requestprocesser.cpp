@@ -4,6 +4,7 @@
 #include "login.h"
 #include "ranking.h"
 #include "chess_gaming.h"
+#include "chat.h"
 
 RequestProcesser::RequestProcesser(QObject *parent,QTcpSocket* so) : QObject(parent)
 {
@@ -34,6 +35,8 @@ void RequestProcesser::readyRead()
                 new ranking(this,map.value("numbers").toInt(),map.value("rank_info").toString());
             else if (map.value("request").toString()=="chess_place")
                 new chess_gaming(this,map.value("x").toInt(),map.value("y").toInt());
+            else if (map.value("request").toString()=="chat")
+                new chat(this);
         }
     }
     else

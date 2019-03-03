@@ -9,17 +9,6 @@ Login::Login(RequestProcesser *rp):RQSTPRCS("login",rp)
 
 }
 
-/* Some codes:
- * recv:
- *      301: login
- *      302: register
- *      303: logout
- * send:
- *      301: lr error
- *      302: lr success
- *      303: logout successful
- *
-*/
 void Login::recv(QVariantMap map)
 {
     QString emsg;

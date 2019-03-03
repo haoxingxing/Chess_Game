@@ -5,7 +5,7 @@
 #include <qthread.h>
 #include "chess_gaming.h"
 ranking::ranking(RequestProcesser* mnm,int n,QString rank_info) : RQSTPRCS (RANK_HEAD,mnm),nb(n)
-{    
+{
     rkif=rank_info;
     this->SendRankStartInfo();
     rkn=new rank_node(this,nb,rank_info);
@@ -15,18 +15,6 @@ ranking::ranking(RequestProcesser* mnm,int n,QString rank_info) : RQSTPRCS (RANK
         rkn->del(ntwkmgr->verify->username);
     });
 }
-
-/* Some codes
- * recv:
- *      101: exit
- *      102: join
- * send:
- *      100: join failed
- *      101: rank fulled
- *      102: rank started
- *      103: rank list changed
- *      104: joined
-*/
 
 void ranking::SendRankStartInfo()
 {
@@ -107,7 +95,7 @@ rank_node::rank_node(QObject *parent, int n,QString rank_info) : QObject (parent
 }
 
 bool rank_node::join(QString username)
-{       
+{
     if (!isranking)
     {
         if (rn[QString::number(nb)+"*"+rkif].now!=nb)

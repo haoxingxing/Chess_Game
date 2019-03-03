@@ -7,6 +7,20 @@
 #include <QTimer>
 #include "rqstprcs.h"
 
+/*
+ * Request Respone
+ * recv:
+ *      101: client ready {+players(QStringList)}
+ *      102: drop chess {+x(int) +y(int)}
+ * send:
+ *      200: server start {}
+ *      201: server ready {+while(QString) +black(QString) +usn(QString) +nowhosturn(QString)}
+ *      202: chess changed {+x(int) +y(int) +who(QString) +nowwhosturn(QString)}
+ *      203: client disconnected {}
+ *      204: force game over {}
+ *      205: game winner appeared {+winner(QString)}
+*/
+
 class chess_gaming : public RQSTPRCS
 {
     Q_OBJECT
@@ -30,7 +44,7 @@ private:
     void init_place();
     void forceRestGame();
     int xlen,ylen;
-    QString game_id;    
+    QString game_id;
     struct a_game
     {
         QString first;

@@ -34,7 +34,8 @@ SOURCES += \
     chess_place.cpp \
     ranking.cpp \
     loading.cpp \
-    chess_place_info.cpp
+    chess_place_info.cpp \
+    chat.cpp
 
 HEADERS += \
         mainnetworkmanger.h \
@@ -45,7 +46,8 @@ HEADERS += \
     chess_place.h \
     ranking.h \
     loading.h \
-    chess_place_info.h
+    chess_place_info.h \
+    chat.h
 
 FORMS += \
         mainnetworkmanger.ui \
@@ -54,7 +56,8 @@ FORMS += \
     chess_place.ui \
     ranking.ui \
     loading.ui \
-    chess_place_info.ui
+    chess_place_info.ui \
+    chat.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

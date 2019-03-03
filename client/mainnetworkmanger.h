@@ -11,6 +11,7 @@
 #define CHESS_HEAD "chess_place"
 #define LOGIN_HEAD "login"
 #define RANK_HEAD "rank"
+#define CHAT_HEAD "chat"
 namespace Ui {
 class MainNetworkManger;
 }

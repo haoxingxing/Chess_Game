@@ -38,6 +38,9 @@ void chess_place::recv(QVariantMap map)
         info=new chess_place_info(this);
         info->show();
         info->AppenedMsg("Waiting For Server");
+        chat_window=new chat(ntwkmgrr,this);
+        chat_window->join(plrlst.join("@"));
+        chat_window->show();
         this->sendClientReady(plrlst);
         break;
     case 201:

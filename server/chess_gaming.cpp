@@ -18,19 +18,8 @@ chess_gaming::~chess_gaming()
 {
     games.remove(game_id);
 }
-/*
- * Some codes
- * recv:
- *      101: client ready
- *      102: drop chess
- * send:
- *      200: server start
- *      201: server ready
- *      202: chess changed
- *      203: client disconnected
- *      204: force game over
- *      205: game winner appeared
-*/
+
+
 void chess_gaming::recv(QVariantMap map)
 {
     switch(map.value("status").toInt()){

@@ -23,7 +23,8 @@ SOURCES += \
     login.cpp \
     chess_gaming.cpp \
     ranking.cpp \
-    rqstprcs.cpp
+    rqstprcs.cpp \
+    chat.cpp
 
 
 # Default rules for deployment.
@@ -38,4 +39,7 @@ HEADERS += \
     login.h \
     chess_gaming.h \
     ranking.h \
-    rqstprcs.h
+    rqstprcs.h \
+    chat.h
+
+DISTFILES +=

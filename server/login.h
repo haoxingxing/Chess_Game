@@ -7,6 +7,18 @@
 #include "rqstprcs.h"
 #define SAVE_AS "user_data.json"
 
+/* Request Respone
+ * recv:
+ *      301: login {+username(QString) +password(QString)}
+ *      302: register {+username(QString) +password(QString)}
+ *      303: logout {}
+ * send:
+ *      301: lr error {+emsg(QString)}
+ *      302: lr success {+username(QString)}
+ *      303: logout successful {}
+ *
+*/
+
 class Login : public RQSTPRCS
 {
 public:
