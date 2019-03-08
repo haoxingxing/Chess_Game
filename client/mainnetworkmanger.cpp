@@ -16,13 +16,13 @@ MainNetworkManger::MainNetworkManger(QWidget *parent) :
     connect(socket,&QTcpSocket::readyRead,this,&MainNetworkManger::ReadyRead);
     connect(socket,&QTcpSocket::disconnected,this,&MainNetworkManger::Disconnected);
     connect(&tmr_for_timeout,&QTimer::timeout,this,&MainNetworkManger::Timeout);
-    socket->connectToHost(ui->address->text(),quint16(ui->port->text().toInt()));
-    ui->status->setText("connecting");
-    ui->connect->hide();
-    ui->address->hide();
-    ui->port->hide();
-    ui->label_2->hide();
-    tmr_for_timeout.start(10000);
+//    socket->connectToHost(ui->address->text(),quint16(ui->port->text().toInt()));
+//    ui->status->setText("connecting");
+//    ui->connect->hide();
+//    ui->address->hide();
+//    ui->port->hide();
+//    ui->label_2->hide();
+//    tmr_for_timeout.start(10000);
 }
 
 MainNetworkManger::~MainNetworkManger()
