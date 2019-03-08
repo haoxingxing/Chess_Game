@@ -18,7 +18,7 @@ void RequestProcesser::send(QVariantMap str,QString _for)
 {
     str.insert("for",_for);
     qDebug() << "server -> client " <<Jsoncoder::encode(str).toLatin1().toStdString().c_str();
-    socket->write(Jsoncoder::encode(str).toLatin1() + "\r\n");
+    socket->write(Jsoncoder::encode(str).toUtf8() + "\r\n");
     socket->flush();
 }
 

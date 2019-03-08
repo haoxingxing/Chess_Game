@@ -33,7 +33,7 @@ MainNetworkManger::~MainNetworkManger()
 void MainNetworkManger::send(QVariantMap map,QString head)
 {
     map.insert("for",head);
-    socket->write((Jsoncoder::encode(map) +"\r\n").toLatin1());
+    socket->write((Jsoncoder::encode(map) +"\r\n").toUtf8());
     socket->flush();
 }
 

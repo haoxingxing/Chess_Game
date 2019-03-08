@@ -2,11 +2,12 @@
 #include "mainnetworkmanger.h"
 #include "login.h"
 #include <QDebug>
+#include <QString>
 #include <QTextCodec>
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    QTextCodec::setCodecForLocale(QTextCodec::codecForName("GB2312"));
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
     MainNetworkManger n;
 
     return a.exec();

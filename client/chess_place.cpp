@@ -67,14 +67,16 @@ void chess_place::recv(QVariantMap map)
         break;
     case 203:
         info->AppenedMsg("Game Over: ""Your competitor has been offline");
+        ui->exit->setText("Game Over: ""Your competitor has been offline\nExit");
         //QMessageBox::information(this,"Game Over","Your competitor has been offline",QMessageBox::Ok);
         goto close;
     case 204:
-        info->AppenedMsg("Game Over: ""Server Force Close");
+        ui->exit->setText("Game Over: ""Your competitor has been offline\nExit");
         //QMessageBox::information(this,"Game Over","Server Force Close",QMessageBox::Ok);
         goto close;
     case 205:
         info->AppenedMsg("Game Over: "+map.value("winner").toString()+" is the winner");
+        ui->exit->setText("Game Over: "+map.value("winner").toString()+" is the winner\nExit");
         //QMessageBox::information(this,"Game Over",map.value("winner").toString()+" is the winner",QMessageBox::Ok);
         goto close;
     }
@@ -186,7 +188,10 @@ void chess_place::set_chess_color(int x, int y, chess_place::colors cls)
 
 void chess_place::paintEvent(QPaintEvent*)
 {
-
+    if (this->width()!=this->height())
+    {
+        this->resize(this->height(),this->height());
+    }
     QPainter ptr(this);
     int screen_wid=this->width();
     int screen_hei=this->height();
@@ -200,24 +205,22 @@ void chess_place::paintEvent(QPaintEvent*)
         screen_left_hei=screen_hei % per_ge_hei;
         screen_left_left_right=screen_left_wid/2;
         screen_left_up_down=screen_left_hei/2;
-    }
-    for (int i=0;i<=xlen;++i) {
-        ptr.drawLine(screen_left_left_right+per_ge_wid*i,screen_left_up_down,screen_left_left_right+per_ge_wid*i,screen_left_up_down+per_ge_hei*ylen);
-    }
-    for (int i=0;i<=ylen;++i) {
-        ptr.drawLine(screen_left_left_right,screen_left_up_down+per_ge_hei*i,screen_left_left_right+per_ge_wid*xlen,screen_left_up_down+per_ge_hei*i);
-    }
-    if (hasinitted)
-    {
+        for (int i=0;i<=xlen;++i) {
+            ptr.drawLine(screen_left_left_right+per_ge_wid*i,screen_left_up_down,screen_left_left_right+per_ge_wid*i,screen_left_up_down+per_ge_hei*ylen);
+        }
+        for (int i=0;i<=ylen;++i) {
+            ptr.drawLine(screen_left_left_right,screen_left_up_down+per_ge_hei*i,screen_left_left_right+per_ge_wid*xlen,screen_left_up_down+per_ge_hei*i);
+        }
         for (int x=0;x<=xlen;++x)
         {
             for (int y=0;y<=ylen;++y)
             {
-                chesses[x][y]->pushbutton->setGeometry(screen_left_left_right+per_ge_wid*x-(per_ge_wid/2),screen_left_up_down+per_ge_hei*y-(per_ge_hei/2),per_ge_wid,per_ge_hei);
+                chesses[x][y]->pushbutton->setGeometry((screen_left_left_right+per_ge_wid*x-(per_ge_wid/2))+(per_ge_wid/5),(screen_left_up_down+per_ge_hei*y-(per_ge_hei/2))+(per_ge_hei/5),per_ge_wid/3*2,per_ge_hei/3*2);
                 chesses[x][y]->pushbutton->show();
             }
         }
     }
+    ui->exit->resize(this->width(),this->height());
 }
 
 

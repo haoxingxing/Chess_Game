@@ -14,17 +14,24 @@
    <string>Chess</string>
   </property>
   <property name="autoFillBackground">
-   <bool>true</bool>
+   <bool>false</bool>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QPushButton" name="exit">
-     <property name="text">
-      <string>EXIT</string>
-     </property>
-    </widget>
-   </item>
-  </layout>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(170, 85, 0);</string>
+  </property>
+  <widget class="QPushButton" name="exit">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>641</width>
+     <height>641</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>EXIT</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
