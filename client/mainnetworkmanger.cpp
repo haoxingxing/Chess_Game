@@ -11,7 +11,9 @@ MainNetworkManger::MainNetworkManger(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->connect->hide();
-
+    this->show();
+    ui->status->setText("Please Check the address");
+    ui->connect->show();
     connect(socket,&QTcpSocket::connected,this,&MainNetworkManger::Connected);
     connect(socket,&QTcpSocket::readyRead,this,&MainNetworkManger::ReadyRead);
     connect(socket,&QTcpSocket::disconnected,this,&MainNetworkManger::Disconnected);
