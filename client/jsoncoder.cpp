@@ -5,7 +5,7 @@
 #include <QDebug>
 QVariantMap Jsoncoder::deocde(QString str)
 {
-    return QJsonDocument::fromJson(str.toLatin1()).toVariant().toMap();
+    return QJsonDocument::fromJson(str.toUtf8()).toVariant().toMap();
 }
 
 QString Jsoncoder::encode(QVariantMap KV)

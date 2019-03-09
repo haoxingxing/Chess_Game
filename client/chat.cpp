@@ -12,6 +12,7 @@ chat::chat(MainNetworkManger* ntwkmgr,QWidget *parent) :
     ntwkmgrr->send(QVariantMap({
                                    std::make_pair("request","chat"),
                                }),MAIN_HEAD);
+    this->setStyleSheet("background-color: rgb(191, 191, 191);");
     this->appenedmessage("Waiting For Server");
 }
 
@@ -71,6 +72,7 @@ void chat::recv(QVariantMap map)
         break;
     case 203:
         this->appenedmessage(map.value("from").toString() + ": " +map.value("msg").toString());
+        this->activateWindow();
         break;
     case 204:
         this->appenedmessage(map.value("who").toString() + " Joined");

@@ -57,6 +57,7 @@ void chess_place::recv(QVariantMap map)
         }
         init_chesses();
         info->AppenedMsg("DONE!");
+        this->activateWindow();
         break;
     case 202:
         info->AppenedMsg("Set Chess:");
@@ -64,6 +65,7 @@ void chess_place::recv(QVariantMap map)
         info->AppenedMsg("y: "+QString::number(map.value("y").toInt()));
         info->AppenedMsg("By: "+map.value("who").toString());
         set_chess_color(map.value("x").toInt(),map.value("y").toInt(),(map.value("who")==my_username)?my:enm);
+        this->activateWindow();
         break;
     case 203:
         info->AppenedMsg("Game Over: ""Your competitor has been offline");
@@ -90,6 +92,7 @@ void chess_place::recv(QVariantMap map)
     }
     return;
 close:
+    this->activateWindow();
     this->delete_chesses();
     repaint();
     ui->exit->show();
