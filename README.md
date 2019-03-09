@@ -1,7 +1,7 @@
 # Chess_Game
 ## --- using C++ and Qt<br>------ A Mult-player Online Chess Game
 # How to compile
-
+## or see complied version https://github.com/haoxingxing/Chess_Game/releases
 First,make sure you've installed the qt5<br>
 Using the command to compile
 ```bash
