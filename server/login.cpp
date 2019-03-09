@@ -71,7 +71,7 @@ void Login::writetofile(QVariantMap vm)
     QFile F(SAVE_AS);
     F.open(QIODevice::ReadWrite);
     F.resize(0);
-    F.write(Jsoncoder::encode(vm).toLatin1());
+    F.write(Jsoncoder::encode(vm).toUtf8());
     F.flush();
     F.close();
 }

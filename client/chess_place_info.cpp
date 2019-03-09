@@ -7,7 +7,6 @@ chess_place_info::chess_place_info(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setGeometry(parent->x()-(parent->width()/2),parent->y()*2,parent->width()/2,parent->height()/2);
-    this->setStyleSheet("background-color: rgb(191, 191, 191);");
 }
 
 chess_place_info::~chess_place_info()

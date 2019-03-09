@@ -3,6 +3,7 @@
 chat::chat(RequestProcesser  *parent) : RQSTPRCS (CHAT_HEAD,parent)
 {
     this->sendReady();
+    this->ChangeColor(240,240,240);
 }
 
 

@@ -12,7 +12,6 @@ chat::chat(MainNetworkManger* ntwkmgr,QWidget *parent) :
     ntwkmgrr->send(QVariantMap({
                                    std::make_pair("request","chat"),
                                }),MAIN_HEAD);
-    this->setStyleSheet("background-color: rgb(191, 191, 191);");
     this->appenedmessage("Waiting For Server");
 }
 

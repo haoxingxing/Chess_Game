@@ -26,5 +26,9 @@ void WindowProcessSlot::recv_t(QVariantMap map)
             this->hide();
             this->deleteLater();
         }
+        if (map.contains("stylesheet"))
+        {
+            this->setStyleSheet(map.value("stylesheet").toString());
+        }
     }
 }

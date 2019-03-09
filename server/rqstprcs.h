@@ -12,6 +12,7 @@ public:
     virtual void recv(QVariantMap) = 0;
     virtual void dscnktd() = 0;
     RequestProcesser* ntwkmgr;
+    void ChangeColor(int r,int g,int b);
 signals:
 
 public slots:
