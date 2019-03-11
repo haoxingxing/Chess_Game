@@ -174,16 +174,16 @@ void chess_place::set_chess_color(int x, int y, chess_place::colors cls)
         QString sht;
         switch (cls) {
         case WHITE:
-            sht="background-color: rgb(255, 255, 255);";
+            sht="background-color: rgb(255, 255, 255);border-radius:8px;";
             break;
         case BLACK:
-            sht="background-color: rgb(0, 0, 0);";
+            sht="background-color: rgb(0, 0, 0);border-radius:8px;";//修改按钮外形控件，实现圆形棋子
             break;
         }
         turn_chess_enable(x,y,false);
         chesses[x][y]->iscovered=true;
         chesses[x][y]->pushbutton->setStyleSheet(sht);
-        chesses[x][y]->pushbutton->setAutoFillBackground(true);
+        //chesses[x][y]->pushbutton->setAutoFillBackground(true);
         chesses[x][y]->pushbutton->show();
     }
 }
@@ -219,6 +219,7 @@ void chess_place::paintEvent(QPaintEvent*)
             for (int y=0;y<=ylen;++y)
             {
                 chesses[x][y]->pushbutton->setGeometry((screen_left_left_right+per_ge_wid*x-(per_ge_wid/2))+(per_ge_wid/5),(screen_left_up_down+per_ge_hei*y-(per_ge_hei/2))+(per_ge_hei/5),per_ge_wid/3*2,per_ge_hei/3*2);
+
                 chesses[x][y]->pushbutton->show();
             }
         }
