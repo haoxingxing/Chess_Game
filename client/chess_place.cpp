@@ -133,7 +133,7 @@ void chess_place::init_chesses()
             });
         }
     }
-    this->setWindowTitle(QString("Chess: "+my_username));//添加窗口标题提示信息
+    this->setWindowTitle(QString("Chess: "+my_username+" - "+QString((my==WHITE)?("白方"):("黑方"))));//添加窗口标题提示信息
     hasinitted=true;
 }
 
