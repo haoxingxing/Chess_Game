@@ -13,6 +13,7 @@ chess_place::chess_place(MainNetworkManger *ntwkmgr,QWidget *parent,int x,int y,
 {
     ui->setupUi(this);
     ui->exit->hide();
+
     connect(ui->exit,&QPushButton::clicked,this,[&]{
         this->hide();
         this->deleteLater();
@@ -132,6 +133,7 @@ void chess_place::init_chesses()
             });
         }
     }
+    this->setWindowTitle(QString("Chess: "+my_username));//添加窗口标题提示信息
     hasinitted=true;
 }
 

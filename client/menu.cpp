@@ -56,7 +56,7 @@ void menu::on_logout_clicked()
 
 void menu::on_maker_clicked()
 {
-    QMessageBox::information(this,"Maker","The Software is made by haoxingxing\nPowered by Qt and C++");
+    QMessageBox::information(this,"Maker","该软件由“ 郝星星 ”设计制作\nThe Software is made by haoxingxing\nPowered by Qt and C++");
 }
 
 void menu::Lets_go_to_the_warplace_with_the_player_list(QStringList list)
