@@ -1,21 +1,36 @@
-#ifndef MAINNETWORKMANGER_H
-#define MAINNETWORKMANGER_H
+#ifndef REQUESTPROCESSER_H
+#define REQUESTPROCESSER_H
 
 #include <QObject>
-#include <QTcpServer>
 #include <QTcpSocket>
+
+#define NETWORK_HEAD "network"
+#define MENU_HEAD "menu"
+#define CHESS_HEAD "chess_place"
+#define LOGIN_HEAD "login"
+#define RANK_HEAD "rank"
+#define CHAT_HEAD "chat"
+#define EID_LEN 8
+#define SID_LEN 6
 
 class MainNetworkManger : public QObject
 {
     Q_OBJECT
 public:
-    explicit MainNetworkManger(QObject *parent = nullptr);
-    void send(QString str);
+    explicit MainNetworkManger(QObject *parent = nullptr,QTcpSocket* so = nullptr);
+    void sendraw(const QVariantMap &args);
+    void senderr(const int &eid,const QString &evid,const QString &err);
+    void sendevt(const int &sid,const QString &evid,const QVariantMap &args);
+    void sendnev(const int &id,const QString &evid);
+    QString getScid() const;
+signals:
+    void Message(QVariantMap);
+    void dscnktd();
 public slots:
-    void newConnection();
-    void err();
+    void readyRead();
 private:
-    QTcpServer *server = new QTcpServer;
+    QString scid;
+    QTcpSocket* socket;
 };
 
-#endif // MAINNETWORKMANGER_H
+#endif // REQUESTPROCESSER_H

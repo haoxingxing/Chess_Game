@@ -1,5 +1,5 @@
-QT -= gui
-QT += network core
+QT -=  gui
+QT += network
 
 CONFIG += c++11 console
 CONFIG -= app_bundle
@@ -17,18 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-    jsoncoder.cpp \
-    login.cpp \
-    chess_gaming.cpp \
-    ranking.cpp \
-    chat.cpp \
-    eventmanger.cpp \
-    server.cpp \
-    mainnetworkmanger.cpp \
-    event.cpp \
-    random.cpp \
-    file_codes.cpp
-
+    client.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -36,16 +25,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    jsoncoder.h \
-    login.h \
-    chess_gaming.h \
-    ranking.h \
-    chat.h \
-    eventmanger.h \
-    server.h \
-    mainnetworkmanger.h \
-    event.h \
-    random.h \
-    file_codes.h
-
-DISTFILES +=
+    client.h

@@ -1,24 +1,59 @@
 #include "jsoncoder.h"
 #include "mainnetworkmanger.h"
 #include <QDebug>
-#include <QThread>
-#include "requestprocesser.h"
-MainNetworkManger::MainNetworkManger(QObject *parent) : QObject(parent)
+#include "random.h"
+
+MainNetworkManger::MainNetworkManger(QObject *parent,QTcpSocket* so) : QObject(parent)
 {
-    server->listen(QHostAddress::Any,8864);
-    QObject::connect(server,&QTcpServer::newConnection,this,&MainNetworkManger::newConnection);
-    connect(server,&QTcpServer::acceptError,this,&MainNetworkManger::err);
+    socket=so;
+    connect(socket,&QTcpSocket::readyRead,this,&MainNetworkManger::readyRead);
+    connect(socket,&QTcpSocket::disconnected,this,&MainNetworkManger::dscnktd);
+    this->scid=Random::GetRandomString(SID_LEN);
 }
 
-void MainNetworkManger::newConnection()
+void MainNetworkManger::sendraw(const QVariantMap &args)
 {
-    while(server->hasPendingConnections()){
-        QTcpSocket *sock=server->nextPendingConnection();
-        new RequestProcesser(nullptr,sock);
-    }
+    qDebug() << "\033[33m" <<Jsoncoder::encode(args).toUtf8().toStdString().c_str() << "\033[0m";
+    socket->write(Jsoncoder::encode(args).toUtf8() + "\r\n");
+    socket->flush();
 }
 
-void MainNetworkManger::err()
+void MainNetworkManger::senderr(const int &eid,const QString &evid, const QString &err)
 {
-    qDebug() << server->errorString();
+    QVariantMap map;
+    map.insert("eid",eid);
+    map.insert("err",err);
+    map.insert("evid",evid);
+    this->sendraw(map);
 }
+
+void MainNetworkManger::sendevt(const int &sid,const QString &evid, const QVariantMap &args)
+{
+    QVariantMap map;
+    map.insert("sid",sid);
+    map.insert("evid",evid);
+    map.insert("arg",args);
+    this->sendraw(map);
+}
+
+void MainNetworkManger::sendnev(const int &id, const QString &evid)
+{
+    QVariantMap map;
+    map.insert("evid",evid);
+    map.insert("id",id);
+    this->sendraw(map);
+}
+
+void MainNetworkManger::readyRead()
+{
+    QString r=socket->readLine().simplified();
+    qDebug()<< "\033[32m"<<r.toStdString().c_str()<< "\033[0m";
+    QVariantMap map=Jsoncoder::deocde(r);
+    emit Message(map);
+}
+
+QString MainNetworkManger::getScid() const
+{
+    return scid;
+}
+

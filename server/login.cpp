@@ -4,56 +4,53 @@
 #include <QCryptographicHash>
 
 
-Login::Login(RequestProcesser *rp):RQSTPRCS("login",rp)
+Login::Login(MainNetworkManger *rp,QString evid,EventManger*p):Event(LOGIN_HEAD,rp,evid),
+    manger(p)
 {
-
 }
 
-void Login::recv(QVariantMap map)
+void Login::recv(QVariantMap& map)
 {
     QString emsg;
-    switch(map.value("type").toInt())
+    switch(map.value("act").toInt())
     {
-    case 301:
-        this->login(map.value("username").toString(),map.value("password").toString(),emsg);
-        goto send_ifo;
-    case 302:
-        this->_register(map.value("username").toString(),map.value("password").toString(),emsg);
-        goto send_ifo;
-    case 303:
+    case 201:
+        this->login(map.value("username").toString(),map.value("password").toString());
+        break;
+    case 202:
+        this->_register(map.value("username").toString(),map.value("password").toString());
+        break;
+    case 203:
         this->Logout();
         return;
     }
-    send_ifo:
-    if (isLogin)
-        SendLoginSuccessMessage();
-    else
-    {
-        SendLoginErrorMessage(emsg);
-    }
 }
 
-bool Login::login(QString username, QString password,QString &emsg)
+bool Login::login(QString username, QString password)
 {
     if (readfromfile().value(username).toString()==QString("%1").arg(QString(QCryptographicHash::hash((password+"Server_Sencond_Slat_+++").toUtf8(),QCryptographicHash::Md5).toHex())))
     {
         this->username=username;
         isLogin=true;
+        changeStatus();
+        sendevt(1,QVariantMap({
+                std::make_pair("username",username)
+                              }));
         return true;
     }
     else
     {
-        emsg="Username or Password Error";
+        senderr(-4);
         return false;
     }
 }
 
-bool Login::_register(QString username, QString password,QString &emsg)
+bool Login::_register(QString username, QString password)
 {
     QVariantMap bmap = readfromfile();
     if (bmap.contains(username))
     {
-        emsg = "User Exist";
+        senderr(-5);
         return false;
     }
     else
@@ -62,6 +59,10 @@ bool Login::_register(QString username, QString password,QString &emsg)
         writetofile(bmap);
         isLogin=true;
         this->username=username;
+        changeStatus();
+        sendevt(1,QVariantMap({
+                std::make_pair("username",username)
+                              }));
         return true;
     }
 }
@@ -82,46 +83,18 @@ QVariantMap Login::readfromfile()
     F.open(QIODevice::ReadWrite);
     return Jsoncoder::deocde(F.readAll());
 }
-void Login::SendLoginErrorMessage(QString emsg)
-{
-    ntwkmgr->send(QVariantMap({
-                         std::make_pair("status",301),
-                         std::make_pair("emsg",emsg)
-                     }),LOGIN_HEAD);
-}
-
-void Login::SendLoginSuccessMessage()
-{
-    ntwkmgr->send(QVariantMap({
-                         std::make_pair("status",302),
-                         std::make_pair("username",username),
-                     }),LOGIN_HEAD);
-}
 
 void Login::Logout()
 {
     isLogin=false;
+    changeStatus();
     username.clear();
-    ntwkmgr->send(QVariantMap({
-                         std::make_pair("status",303),
-                              }),LOGIN_HEAD);
+    sendevt(2,QVariantMap({}));
 }
 
-void Login::dscnktd()
+void Login::changeStatus()
 {
-    this->Logout();
-    this->deleteLater();
+    manger->islogged=isLogin;
+    manger->username=username;
+    manger->LoginStatusChanged();
 }
-
-//bool Login::list_find(QString username)
-//{
-//    for (std::list<std::string>::iterator it = userlogged.begin();it != userlogged.end();++it) {
-//        if (*it==username.toStdString())
-//        {
-//            return true;
-//        }
-//    }
-//    return false;
-//}
-
-//std::list<std::string> Login::userlogged = std::list<std::string>();
