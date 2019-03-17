@@ -1,6 +1,7 @@
 #include "event.h"
 #include "file_codes.h"
-Event::Event(QString name,MainNetworkManger *parent,QString e) : QObject(nullptr),ntwkmgr(parent),type(name),evid(e)
+#include "eventmanger.h"
+Event::Event(QString name,MainNetworkManger *parent,QString e,EventManger* par) : QObject(nullptr),ntwkmgr(parent),evtmgr(par),type(name),evid(e)
 {
     connect(parent,&MainNetworkManger::Message,this,&Event::recv_t);
     connect(parent,&MainNetworkManger::dscnktd,this,&Event::dscnktd);
@@ -18,12 +19,31 @@ void Event::reconnected()
 }
 void Event::window_info()
 {
-    this->senderr(-3);
+    QVariantMap m=File_Codes::readmap(type+"_wi");
+    if (m.isEmpty())
+        this->senderr(-3);
+    else {
+        this->sendevt(3,File_Codes::readmap(type+"_wi"));
+    }
 }
 
 bool Event::isreconnectedable()
 {
     return false;
+}
+
+void Event::hide()
+{
+    sendevt(3,QVariantMap({
+                              std::make_pair("isshow",false)
+                          }));
+}
+
+void Event::show()
+{
+    sendevt(3,QVariantMap({
+                              std::make_pair("isshow",true)
+                          }));
 }
 
 void Event::reconnected_t(MainNetworkManger * p)
@@ -47,7 +67,7 @@ void Event::senderr(const int &eid)
 void Event::recv_t(QVariantMap map)
 {
     switch (map.value(JSON_ACT).toInt()){
-        case 101:
+    case 101:
         this->window_info();
         break;
     default:

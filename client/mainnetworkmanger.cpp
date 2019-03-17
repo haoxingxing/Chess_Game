@@ -54,20 +54,19 @@ void MainNetworkManger::Connected()
 {
     tmr_for_timeout.stop();
     ui->status->setText("connected");
-    //(new login(this))->show();
     this->hide();
 }
 
 void MainNetworkManger::ReadyRead()
 {
     QString data = socket->readLine();
-    qDebug() << data;
+    qDebug() << data.toUtf8().toStdString().c_str();
     do{
         QVariantMap map=Jsoncoder::deocde(data);
         switch (map.value(JSON_MODE).toInt())
         {
         case 1:
-            events.insert(map.value(JSON_EVENT_ID).toString(),new EventWidget(nullptr,this,map.value(JSON_EVENT_ID).toString()));
+            events.insert(map.value(JSON_EVENT_ID).toString(),NewEvent(map.value(JSON_NEW_EVENT_ID).toInt(),map.value(JSON_EVENT_ID).toString()));
             break;
         case 2:
             if (map.value(JSON_EVENT_ID).toString() != "new")
@@ -80,10 +79,10 @@ void MainNetworkManger::ReadyRead()
             }
             break;
         case 3:
-            events[map.value(JSON_EVENT_ID).toString()]->recv_t(map.value(JSON_ACT).toInt(),map.value(JSON_ARG).toMap());
+            if (events.contains(map.value(JSON_EVENT_ID).toString()))
+                events[map.value(JSON_EVENT_ID).toString()]->recv_t(map.value(JSON_ACT).toInt(),map.value(JSON_ARG).toMap());
             break;
         }
-        emit Message(map);
         data.clear();
     }
     while ((data=socket->readLine())!="");
@@ -110,6 +109,10 @@ void MainNetworkManger::Disconnected()
     ui->port->show();
     ui->connect->show();
     ui->label_2->show();
+    foreach (Event*p,events)
+    {
+        p->disconnected();
+    }
     this->activateWindow();
 }
 
@@ -123,4 +126,16 @@ void MainNetworkManger::on_connect_clicked()
     tmr_for_timeout.start(10000);
     ui->status->setText("connecting");
 
+}
+
+Event* MainNetworkManger::NewEvent(int id,QString evid)
+{
+    switch(id)
+    {
+    case 1:
+        return new login(this,nullptr,evid);
+    case 2:
+        return new menu(this,nullptr,evid);
+    }
+    return nullptr;
 }

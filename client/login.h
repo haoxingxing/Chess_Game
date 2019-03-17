@@ -15,7 +15,7 @@ class login : public EventWidget
     Q_OBJECT
 
 public:
-    explicit login(MainNetworkManger *ntmgr,QWidget *parent = nullptr);
+    explicit login(MainNetworkManger *ntmgr,QWidget *parent,QString evid);
     ~login();
     enum LOGIN_TYPE{
         LOGIN,
@@ -23,6 +23,7 @@ public:
     };
     void Process_Login(LOGIN_TYPE);
 private slots:
+    void err(int,QString);
     void on_reg_clicked();
     void recv(int,QVariantMap);
     void on_logi_clicked();

@@ -5,7 +5,6 @@
 #include <QFile>
 #include "server.h"
 #include "event.h"
-#include "eventmanger.h"
 #define SAVE_AS "user_data.json"
 
 class Login : public Event
@@ -22,7 +21,7 @@ private:
    static void writetofile(QVariantMap vm);
    static QVariantMap readfromfile();
    void changeStatus();
-   EventManger* manger;
+   void next_step();
 };
 
 #endif // LOGIN_H

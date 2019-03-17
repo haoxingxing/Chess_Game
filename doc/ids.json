@@ -1,36 +1,58 @@
 {
-    "MODE_CODES":{
-        "1":"NEW EVENT",
-        "2":"error",
-        "3":"event"
+    "MODE_CODES": {
+        "1": "NEW EVENT",
+        "2": "error",
+        "3": "event"
     },
-    "ERROR_CODES":{
-        "for":"Server to Client",
-        "range":"-1 -100",
+    "ERROR_CODES": {
+        "for": "Server to Client",
+        "range": "-1 -100",
         "-1": "事件类型未找到",
         "-2": "事件未找到",
         "-3": "无窗口信息",
-        "-4":"用户名或密码错误",
-        "-5":"用户名已存在"
+        "-4": "用户名或密码错误",
+        "-5": "用户名已存在"
     },
-    "ACT_CODES":{
-        "for":"Client to Server",
-        "Usual":{
-            "range":"101 199",
-            "101":"获取窗口信息"
+    "ACT_CODES": {
+        "for": "Client to Server",
+        "Usual": {
+            "range": "101 199",
+            "101": "获取窗口信息",
+            "102": "删除事件"
         },
-        "Login":{
-            "range":"201 299",
-            "201":"登录",
-            "202":"注册",
-            "203":"登出"
-        }            
+        "Login": {
+            "range": "201 299",
+            "201": "登录",
+            "202": "注册",
+            "203": "登出"
+        },
+        "menu": {
+            "range": "301 399",
+            "301": "开始匹配",
+            "302": "登出"
+        },
+        "rank": {
+            "range": "401 499",
+            "401":"加入匹配"
+        }
     },
-    "STATUS_CODES":{
-        "for":"Server to Client",
-        "range":"1 99",   
-        "1":"登录成功",
-        "2":"登出成功",
-        "3":"窗口信息设置"
+    "STATUS_CODES": {
+        "for": "Server to Client",
+        "range": "1 99",
+        "1": "登录成功",
+        "2": "登出成功",
+        "3": "窗口信息设置",
+        "4": "加入匹配成功",
+        "5": "匹配队列改变",
+        "6": "匹配队列满",
+        "7": "退出成功",
+        "8": "隐藏菜单",
+        "9": "显示菜单"
+    },
+    "Window_Info_Args": {
+        "height": "int",
+        "width": "int",
+        "title": "QString",
+        "stylesheet": "QString"
     }
 }

@@ -3,20 +3,19 @@
 
 #include <QObject>
 #include "mainnetworkmanger.h"
-class Event : public QObject
+class Event
 {
-    Q_OBJECT
 public:
     explicit Event(MainNetworkManger* ntwkmgr,QString evid);
+    virtual ~Event(){}
     virtual void recv_t(int,QVariantMap);
-    virtual void err(int eid,QString estr) = 0;
+    virtual void err(int eid,QString estr);
     virtual void recv(int status_id,QVariantMap args) = 0;
-    virtual void disconnected() = 0;
+    virtual void disconnected();
     void send(const int& act, const QVariantMap& args);
-signals:
+    MainNetworkManger* ntwkmgr;
 
 private:
-    MainNetworkManger* ntwkmgr;
     QString evid;
 };
 

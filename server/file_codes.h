@@ -6,6 +6,8 @@ class File_Codes
 {
 public:
     static QString read(int status);
+    static QVariantMap readmap(QString status);
+    static int readint(QString status);
 };
 
 #endif // FILE_CODES_H

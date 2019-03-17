@@ -30,7 +30,6 @@ SOURCES += \
     jsoncoder.cpp \
     login.cpp \
     menu.cpp \
-    windowprocessslot.cpp \
     chess_place.cpp \
     ranking.cpp \
     loading.cpp \
@@ -44,7 +43,6 @@ HEADERS += \
     jsoncoder.h \
     login.h \
     menu.h \
-    windowprocessslot.h \
     chess_place.h \
     ranking.h \
     loading.h \

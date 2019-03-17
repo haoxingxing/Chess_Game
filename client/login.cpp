@@ -2,8 +2,8 @@
 #include "ui_login.h"
 #include "jsoncoder.h"
 #include <QCryptographicHash>
-login::login(MainNetworkManger *ntmgr,QWidget *parent) :
-    WindowProcessSlot("login",parent,ntmgr),
+login::login(MainNetworkManger *ntmgr,QWidget *parent,QString evid) :
+    EventWidget(parent,ntmgr,evid),
     ui(new Ui::login)
 {
     ui->setupUi(this);
@@ -17,15 +17,25 @@ login::~login()
 
 void login::Process_Login(LOGIN_TYPE tp)
 {
-    ntwkmgrr->send(QVariantMap({
-                                   std::make_pair("username",ui->user->text()),
-                                   std::make_pair("password",QString("%1").arg(QString(QCryptographicHash::hash((ui->pwd->text()+"Client_First_Slat_+++").toUtf8(),QCryptographicHash::Md5).toHex()))),
-                                   std::make_pair("type",(tp==LOGIN)?301:302)
-                               }),LOGIN_HEAD);
+    this->send((tp==LOGIN)?201:202,QVariantMap({
+                                                   std::make_pair("username",ui->user->text()),
+                                                   std::make_pair("password",QString("%1").arg(QString(QCryptographicHash::hash((ui->pwd->text()+"Client_First_Slat_+++").toUtf8(),QCryptographicHash::Md5).toHex()))),
+                                               }));
     ui->user->setEnabled(false);
     ui->pwd->setEnabled(false);
     ui->logi->setEnabled(false);
     ui->reg->setEnabled(false);
+}
+
+void login::err(int, QString e)
+{
+    ui->emsg->setText(e);
+    ui->emsg->show();
+    ui->logi->setEnabled(true);
+    ui->reg->setEnabled(true);
+    ui->user->setEnabled(true);
+    ui->pwd->setEnabled(true);
+    ui->pwd->clear();
 }
 
 void login::on_reg_clicked()
@@ -33,31 +43,23 @@ void login::on_reg_clicked()
     Process_Login(REGISTER);
 }
 
-void login::recv(QVariantMap map)
+void login::recv(int status,QVariantMap map)
 {
-    switch(map.value("status").toInt())
+    switch(status)
     {
-    case 301:
-        ui->emsg->setText(map.value("emsg").toString());
-        ui->emsg->show();
-        ui->logi->setEnabled(true);
-        ui->reg->setEnabled(true);
-        ui->user->setEnabled(true);
-        ui->pwd->setEnabled(true);
+    case 1:
         ui->pwd->clear();
-        break;
-    case 302:
-        ui->pwd->clear();
-        hd = new menu(ntwkmgrr,nullptr,map.value("username").toString());
-        hd->show();
+//        hd = new menu(ntwkmgrr,nullptr,map.value("username").toString());
+//        hd->show();
         this->hide();
+        ntwkmgr->username=map["username"].toString();
         break;
-    case 303:
-        if (hd!=nullptr){
-            hd->hide();
-            delete hd;
-            hd=nullptr;
-        }
+    case 2:
+//        if (hd!=nullptr){
+//            hd->hide();
+//            delete hd;
+//            hd=nullptr;
+//        }
         ui->logi->setEnabled(true);
         ui->reg->setEnabled(true);
         ui->user->setEnabled(true);

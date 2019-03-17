@@ -3,5 +3,16 @@
     "-2":"事件未找到",
     "-3":"无窗口信息",
     "-4":"用户名或密码错误",
-    "-5":"用户名已存在"
+    "-5":"用户名已存在",
+    "login_wi":{
+        "title": "登录",
+        "stylesheet": "",
+        "isshow":true
+    },
+    "connected":1,
+    "logged":2,
+    "menu_rank_1":{
+        "count":2,
+        "rank_info":"chess_game_25*25_2"
+    }
 }

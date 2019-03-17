@@ -4,20 +4,25 @@
 #include <QObject>
 #include "event.h"
 #include "server.h"
+#define NE(whattime) NewEvent(File_Codes::readint(#whattime))
+
 class Login;
 class EventManger : public QObject
 {
     Q_OBJECT
 public:
     explicit EventManger(MainNetworkManger *ntwkmgr);
+    QString username;
 signals:
 
 public slots:
     void recv(QVariantMap);
+    QString NewEvent(int id);
+    void DelEvent(QString evid);
+    Event* GetEvent(QString evid);
+    QList<Event*> FindEvent(QString type);
 private:
     friend Login;
-    QList<Event*> FindEvent(QString type);
-    void NewEvent(QString eid,Event*);
     struct Socket{
         QMap<QString/* Event ID */,Event*> events;
         bool isonline = true;
@@ -27,7 +32,6 @@ private:
     void disconnected();
     MainNetworkManger *ntwkmgr;
     bool islogged = false;
-    QString username;
     void LoginStatusChanged();
     void AnotherLogged();
 

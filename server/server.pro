@@ -27,7 +27,8 @@ SOURCES += \
     mainnetworkmanger.cpp \
     event.cpp \
     random.cpp \
-    file_codes.cpp
+    file_codes.cpp \
+    menu.cpp
 
 
 # Default rules for deployment.
@@ -46,6 +47,7 @@ HEADERS += \
     mainnetworkmanger.h \
     event.h \
     random.h \
-    file_codes.h
+    file_codes.h \
+    menu.h
 
 DISTFILES +=

@@ -35,6 +35,7 @@ public:
     void sendraw(const QVariantMap &args);
     void sendevt(const int &sid,const QString &evid,const QVariantMap &args);
     void sendnev(const int &id);
+    QString username;
 signals:
     void Message(QVariantMap);
     void Disconnect();
@@ -47,6 +48,8 @@ private slots:
     void on_connect_clicked();
 
 private:
+    Event* NewEvent(int id,QString evid);
+
     QTcpSocket *socket = new QTcpSocket;
     Ui::MainNetworkManger *ui;
     QTimer tmr_for_timeout;

@@ -1,11 +1,10 @@
 #include "jsoncoder.h"
 #include "login.h"
-
+#include "eventmanger.h"
 #include <QCryptographicHash>
 
-
-Login::Login(MainNetworkManger *rp,QString evid,EventManger*p):Event(LOGIN_HEAD,rp,evid),
-    manger(p)
+#include "file_codes.h"
+Login::Login(MainNetworkManger *rp,QString evid,EventManger*p):Event(LOGIN_HEAD,rp,evid,p)
 {
 }
 
@@ -35,6 +34,8 @@ bool Login::login(QString username, QString password)
         sendevt(1,QVariantMap({
                 std::make_pair("username",username)
                               }));
+        hide();
+        this->next_step();
         return true;
     }
     else
@@ -62,6 +63,8 @@ bool Login::_register(QString username, QString password)
         sendevt(1,QVariantMap({
                 std::make_pair("username",username)
                               }));
+        hide();
+        this->next_step();
         return true;
     }
 }
@@ -89,11 +92,17 @@ void Login::Logout()
     changeStatus();
     username.clear();
     sendevt(2,QVariantMap({}));
+    show();
 }
 
 void Login::changeStatus()
 {
-    manger->islogged=isLogin;
-    manger->username=username;
-    manger->LoginStatusChanged();
+    evtmgr->islogged=isLogin;
+    evtmgr->username=username;
+    evtmgr->LoginStatusChanged();
+}
+
+void Login::next_step()
+{
+    evtmgr->NewEvent(2);
 }

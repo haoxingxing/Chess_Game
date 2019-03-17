@@ -9,35 +9,32 @@
  *  3: rank
  *  4: chess_place
  */
+
+
 #include "login.h"
+#include "menu.h"
+#include "ranking.h"
 EventManger::EventManger(MainNetworkManger *parent) : QObject(parent),ntwkmgr(parent)
 {
     this->sockets.insert(ntwkmgr->getScid(),new Socket);
     connect(parent,&MainNetworkManger::Message,this,&EventManger::recv);
     connect(parent,&MainNetworkManger::dscnktd,this,&EventManger::disconnected);
     qDebug() << "New ["<<this<<"]" << ntwkmgr->getScid();
+    NE(connected);
 }
 
 void EventManger::recv(QVariantMap map)
 {
     if (map.value(JSON_EVENT_ID).toString()=="new")
     {
-        QString evid = Random::GetRandomString(EID_LEN);
-        switch (map.value(JSON_NEW_EVENT_ID).toInt()) {
-        case 1:
-            NewEvent(evid,new Login(ntwkmgr,evid,this));
-            ntwkmgr->sendnev(map.value(JSON_NEW_EVENT_ID).toInt(),evid);
-            break;
-        default:
-            ntwkmgr->senderr(-1,"new",File_Codes::read(-1));
-            break;
-        }
+        NewEvent(map.value(JSON_NEW_EVENT_ID).toInt());
     }
     else
     {
         if (sockets[ntwkmgr->getScid()]->events.contains(map.value(JSON_EVENT_ID).toString()))
         {
-            sockets[ntwkmgr->getScid()]->events[map.value(JSON_EVENT_ID).toString()]->recv_t(map.value(JSON_ARG).toMap());
+            Event* p=sockets[ntwkmgr->getScid()]->events[map.value(JSON_EVENT_ID).toString()];
+            p->recv_t(map.value(JSON_ARG).toMap());
         } else {
             ntwkmgr->senderr(-2,"new",File_Codes::read(-2));
         }
@@ -57,10 +54,43 @@ QList<Event*> EventManger::FindEvent(QString type)
     return list;
 }
 
-void EventManger::NewEvent(QString eid,Event * pointer)
+QString EventManger::NewEvent(int id)
 {
-    this->sockets.value(ntwkmgr->getScid())->events.insert(eid,pointer);
-    qDebug()<<"Created New Event: " <<eid<<"["<<pointer<<"] in Socket "<<ntwkmgr->getScid();
+    QString evid = Random::GetRandomString(EID_LEN);
+    Event* pointer;
+    switch (id)
+    {
+    case 0:
+        return "";
+    case 1:
+        pointer=new Login(ntwkmgr,evid,this);
+        break;
+    case 2:
+        pointer=new menu(ntwkmgr,evid,this);
+        break;
+    case 3:
+        pointer=new ranking(ntwkmgr,evid,this);
+        break;
+    default:
+        ntwkmgr->senderr(-1,"new",File_Codes::read(-1));
+        return "";
+    }
+    this->sockets.value(ntwkmgr->getScid())->events.insert(evid,pointer);
+    ntwkmgr->sendnev(id,evid);
+    qDebug()<<"Created New Event: " <<evid<<"["<<pointer<<"] in Socket "<<ntwkmgr->getScid();
+    return evid;
+}
+
+void EventManger::DelEvent(QString evid)
+{
+    delete this->sockets[ntwkmgr->getScid()]->events[evid];
+    this->sockets[ntwkmgr->getScid()]->events.remove(evid);
+    qDebug() << "Deleted Event "<<evid;
+}
+
+Event *EventManger::GetEvent(QString evid)
+{
+    return this->sockets[ntwkmgr->getScid()]->events[evid];
 }
 
 void EventManger::disconnected()
@@ -117,7 +147,6 @@ void EventManger::LoginStatusChanged()
             }
             users[username].remove("offlined");
         }
-
     }
     else {
         users[username].remove(ntwkmgr->getScid());

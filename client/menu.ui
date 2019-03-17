@@ -65,7 +65,7 @@
         </font>
        </property>
        <property name="text">
-        <string>You've Logged In As </string>
+        <string/>
        </property>
       </widget>
      </item>
