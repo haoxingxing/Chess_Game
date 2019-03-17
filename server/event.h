@@ -9,7 +9,7 @@ class Event : public QObject
     Q_OBJECT
 public:
     explicit Event(QString name,MainNetworkManger *parent,QString evid);
-    virtual void recv(QVariantMap&) = 0;
+    virtual void recv(const int&,const QVariantMap&) = 0;
     virtual void dscnktd();
     virtual void reconnected();
     virtual void window_info();

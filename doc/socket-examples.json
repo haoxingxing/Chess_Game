@@ -1,0 +1,25 @@
+{
+    "server to client": {
+        "ERROR": {
+            "EID": 0,
+            "ERR": "string",
+            "EVID": "event id"
+        },
+        "EVENT": {
+            "SID": 0,
+            "ARG": {
+                "arg": "s"
+            },
+            "EVID": "event id"
+        }
+    },
+    "client to server": {
+        "EVENT": {
+            "event" : "eid (new)",
+            "id":"0|new|",
+            "ARG":{
+
+            }
+        }
+    }
+}

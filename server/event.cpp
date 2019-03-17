@@ -1,6 +1,6 @@
 #include "event.h"
 #include "file_codes.h"
-Event::Event(QString name,MainNetworkManger *parent,QString e) : QObject(parent),ntwkmgr(parent),type(name),evid(e)
+Event::Event(QString name,MainNetworkManger *parent,QString e) : QObject(nullptr),ntwkmgr(parent),type(name),evid(e)
 {
     connect(parent,&MainNetworkManger::Message,this,&Event::recv_t);
     connect(parent,&MainNetworkManger::dscnktd,this,&Event::dscnktd);
@@ -46,12 +46,12 @@ void Event::senderr(const int &eid)
 
 void Event::recv_t(QVariantMap map)
 {
-    switch (map.value("act").toInt()){
+    switch (map.value(JSON_ACT).toInt()){
         case 101:
         this->window_info();
         break;
     default:
-        this->recv(map);
+        this->recv(map.value(JSON_ACT).toInt(),map.value(JSON_ARG).toMap());
     };
 }
 

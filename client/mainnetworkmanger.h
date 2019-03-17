@@ -12,10 +12,19 @@
 #define LOGIN_HEAD "login"
 #define RANK_HEAD "rank"
 #define CHAT_HEAD "chat"
+
+#define JSON_ACT "act"
+#define JSON_ARG "arg"
+#define JSON_ERROR_ID "eid"
+#define JSON_ERROR_STR "err"
+#define JSON_EVENT_ID "evid"
+#define JSON_MODE "mode"
+#define JSON_NEW_EVENT_ID "id"
+
 namespace Ui {
 class MainNetworkManger;
 }
-
+class Event;
 class MainNetworkManger : public QWidget
 {
     Q_OBJECT
@@ -23,7 +32,9 @@ class MainNetworkManger : public QWidget
 public:
     explicit MainNetworkManger(QWidget *parent = nullptr);
     ~MainNetworkManger();
-    void send(QVariantMap,QString);
+    void sendraw(const QVariantMap &args);
+    void sendevt(const int &sid,const QString &evid,const QVariantMap &args);
+    void sendnev(const int &id);
 signals:
     void Message(QVariantMap);
     void Disconnect();
@@ -40,6 +51,7 @@ private:
     Ui::MainNetworkManger *ui;
     QTimer tmr_for_timeout;
     QVector<QWidget*> wds;
+    QMap<QString,Event*> events;
 };
 
 #endif // MAINNETWORKMANGER_H

@@ -9,10 +9,9 @@ Login::Login(MainNetworkManger *rp,QString evid,EventManger*p):Event(LOGIN_HEAD,
 {
 }
 
-void Login::recv(QVariantMap& map)
+void Login::recv(const int& status,const QVariantMap& map)
 {
-    QString emsg;
-    switch(map.value("act").toInt())
+    switch(status)
     {
     case 201:
         this->login(map.value("username").toString(),map.value("password").toString());

@@ -15,18 +15,18 @@ EventManger::EventManger(MainNetworkManger *parent) : QObject(parent),ntwkmgr(pa
     this->sockets.insert(ntwkmgr->getScid(),new Socket);
     connect(parent,&MainNetworkManger::Message,this,&EventManger::recv);
     connect(parent,&MainNetworkManger::dscnktd,this,&EventManger::disconnected);
-    qDebug() << "Hello World ["<<this<<"]" << ntwkmgr->getScid();
+    qDebug() << "New ["<<this<<"]" << ntwkmgr->getScid();
 }
 
 void EventManger::recv(QVariantMap map)
 {
-    if (map.value("event").toString()=="new")
+    if (map.value(JSON_EVENT_ID).toString()=="new")
     {
         QString evid = Random::GetRandomString(EID_LEN);
-        switch (map.value("id").toInt()) {
+        switch (map.value(JSON_NEW_EVENT_ID).toInt()) {
         case 1:
             NewEvent(evid,new Login(ntwkmgr,evid,this));
-            ntwkmgr->sendnev(map.value("id").toInt(),evid);
+            ntwkmgr->sendnev(map.value(JSON_NEW_EVENT_ID).toInt(),evid);
             break;
         default:
             ntwkmgr->senderr(-1,"new",File_Codes::read(-1));
@@ -35,9 +35,9 @@ void EventManger::recv(QVariantMap map)
     }
     else
     {
-        if (sockets[ntwkmgr->getScid()]->events.contains(map.value("event").toString()))
+        if (sockets[ntwkmgr->getScid()]->events.contains(map.value(JSON_EVENT_ID).toString()))
         {
-            sockets[ntwkmgr->getScid()]->events[map.value("event").toString()]->recv_t(map.value("arg").toMap());
+            sockets[ntwkmgr->getScid()]->events[map.value(JSON_EVENT_ID).toString()]->recv_t(map.value(JSON_ARG).toMap());
         } else {
             ntwkmgr->senderr(-2,"new",File_Codes::read(-2));
         }
@@ -96,7 +96,7 @@ void EventManger::disconnected()
         }
     }
     sockets.remove(ntwkmgr->getScid());
-    qDebug() << "Good Bye The World ["<<this<<"]"<< ntwkmgr->getScid();
+    qDebug() << "Deleted ["<<this<<"]"<< ntwkmgr->getScid();
     ntwkmgr->deleteLater();
     this->deleteLater();
 }

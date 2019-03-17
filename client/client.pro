@@ -35,7 +35,9 @@ SOURCES += \
     ranking.cpp \
     loading.cpp \
     chess_place_info.cpp \
-    chat.cpp
+    chat.cpp \
+    eventwidget.cpp \
+    event.cpp
 
 HEADERS += \
         mainnetworkmanger.h \
@@ -47,7 +49,9 @@ HEADERS += \
     ranking.h \
     loading.h \
     chess_place_info.h \
-    chat.h
+    chat.h \
+    eventwidget.h \
+    event.h
 
 FORMS += \
         mainnetworkmanger.ui \

@@ -12,7 +12,7 @@ class Login : public Event
 {
 public:
    Login(MainNetworkManger*rp,QString evid,EventManger*);
-   void recv(QVariantMap&);
+   void recv(const int&,const QVariantMap&);
    bool login(QString username,QString password);
    bool _register(QString username,QString password);
    void Logout();

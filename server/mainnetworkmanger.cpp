@@ -21,26 +21,29 @@ void MainNetworkManger::sendraw(const QVariantMap &args)
 void MainNetworkManger::senderr(const int &eid,const QString &evid, const QString &err)
 {
     QVariantMap map;
-    map.insert("eid",eid);
-    map.insert("err",err);
-    map.insert("evid",evid);
+    map.insert(JSON_ERROR_ID,eid);
+    map.insert(JSON_ERROR_STR,err);
+    map.insert(JSON_EVENT_ID,evid);
+    map.insert(JSON_MODE,2);
     this->sendraw(map);
 }
 
 void MainNetworkManger::sendevt(const int &sid,const QString &evid, const QVariantMap &args)
 {
     QVariantMap map;
-    map.insert("sid",sid);
-    map.insert("evid",evid);
-    map.insert("arg",args);
+    map.insert(JSON_ACT,sid);
+    map.insert(JSON_EVENT_ID,evid);
+    map.insert(JSON_ARG,args);
+    map.insert(JSON_MODE,3);
     this->sendraw(map);
 }
 
 void MainNetworkManger::sendnev(const int &id, const QString &evid)
 {
     QVariantMap map;
-    map.insert("evid",evid);
-    map.insert("id",id);
+    map.insert(JSON_EVENT_ID,evid);
+    map.insert(JSON_NEW_EVENT_ID,id);
+    map.insert(JSON_MODE,1);
     this->sendraw(map);
 }
 

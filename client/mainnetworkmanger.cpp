@@ -5,6 +5,8 @@
 #include "menu.h"
 #include "ranking.h"
 #include "chess_place.h"
+#include "event.h"
+#include <qmessagebox.h>
 MainNetworkManger::MainNetworkManger(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MainNetworkManger)
@@ -18,13 +20,6 @@ MainNetworkManger::MainNetworkManger(QWidget *parent) :
     connect(socket,&QTcpSocket::readyRead,this,&MainNetworkManger::ReadyRead);
     connect(socket,&QTcpSocket::disconnected,this,&MainNetworkManger::Disconnected);
     connect(&tmr_for_timeout,&QTimer::timeout,this,&MainNetworkManger::Timeout);
-//    socket->connectToHost(ui->address->text(),quint16(ui->port->text().toInt()));
-//    ui->status->setText("connecting");
-//    ui->connect->hide();
-//    ui->address->hide();
-//    ui->port->hide();
-//    ui->label_2->hide();
-//    tmr_for_timeout.start(10000);
 }
 
 MainNetworkManger::~MainNetworkManger()
@@ -32,18 +27,34 @@ MainNetworkManger::~MainNetworkManger()
     delete ui;
 }
 
-void MainNetworkManger::send(QVariantMap map,QString head)
+void MainNetworkManger::sendraw(const QVariantMap &args)
 {
-    map.insert("for",head);
-    socket->write((Jsoncoder::encode(map) +"\r\n").toUtf8());
+    qDebug() << "\033[33m" <<Jsoncoder::encode(args).toUtf8().toStdString().c_str() << "\033[0m";
+    socket->write(Jsoncoder::encode(args).toUtf8() + "\r\n");
     socket->flush();
+}
+
+void MainNetworkManger::sendevt(const int &sid,const QString &evid, const QVariantMap &args)
+{
+    QVariantMap map;
+    map.insert(JSON_ACT,sid);
+    map.insert(JSON_EVENT_ID,evid);
+    map.insert(JSON_ARG,args);
+    this->sendraw(map);
+}
+void MainNetworkManger::sendnev(const int &id)
+{
+    QVariantMap map;
+    map.insert(JSON_EVENT_ID,"new");
+    map.insert(JSON_NEW_EVENT_ID,id);
+    this->sendraw(map);
 }
 
 void MainNetworkManger::Connected()
 {
     tmr_for_timeout.stop();
     ui->status->setText("connected");
-    (new login(this))->show();
+    //(new login(this))->show();
     this->hide();
 }
 
@@ -53,14 +64,24 @@ void MainNetworkManger::ReadyRead()
     qDebug() << data;
     do{
         QVariantMap map=Jsoncoder::deocde(data);
-        if (map.value("for").toString().contains("network"))
+        switch (map.value(JSON_MODE).toInt())
         {
-            if (map.value("hide").toString().contains("network"))
-                this->hide();
-            if (map.value("show").toString().contains("network"))
-                this->show();
-            if (map.value("close").toString().contains("network"))
-                exit(EXIT_SUCCESS);
+        case 1:
+            events.insert(map.value(JSON_EVENT_ID).toString(),new EventWidget(nullptr,this,map.value(JSON_EVENT_ID).toString()));
+            break;
+        case 2:
+            if (map.value(JSON_EVENT_ID).toString() != "new")
+            {
+                events[map.value(JSON_EVENT_ID).toString()]->err(map.value(JSON_ERROR_ID).toInt(),map.value(JSON_ERROR_STR).toString());
+            }
+            else
+            {
+                QMessageBox::critical(nullptr,QString::number(map[JSON_ERROR_ID].toInt()),map[JSON_ERROR_STR].toString());
+            }
+            break;
+        case 3:
+            events[map.value(JSON_EVENT_ID).toString()]->recv_t(map.value(JSON_ACT).toInt(),map.value(JSON_ARG).toMap());
+            break;
         }
         emit Message(map);
         data.clear();

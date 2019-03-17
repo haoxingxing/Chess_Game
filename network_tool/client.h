@@ -13,7 +13,6 @@ public:
 signals:
 
 public slots:
-    void recv();
 private:
     QTcpSocket* socket;
 };
