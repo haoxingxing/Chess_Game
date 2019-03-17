@@ -43,6 +43,7 @@ void menu::recv(int s,QVariantMap)
 
 void menu::on_logout_clicked()
 {
+    send(302,QVariantMap());
 
 }
 

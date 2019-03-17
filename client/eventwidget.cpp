@@ -17,6 +17,10 @@ void EventWidget::recv_t(int status, QVariantMap map)
     case 3:
         this->SetWindowInfo(map);
         break;
+    case 10:
+        this->close();
+        this->deleteLater();
+        break;
     default:
         this->recv(status,map);
     }

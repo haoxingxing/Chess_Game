@@ -16,6 +16,7 @@ public:
     virtual bool isreconnectedable();
     void hide();
     void show();
+    void close();
     void reconnected_t(MainNetworkManger*);
     void sendevt(const int &sid, const QVariantMap &args);
     void senderr(const int &eid);

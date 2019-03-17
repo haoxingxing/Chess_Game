@@ -22,6 +22,7 @@ void menu::recv(const int & s, const QVariantMap &)
         foreach(Event* p,evtmgr->FindEvent(LOGIN_HEAD)){
             p->recv(203,QVariantMap());
         }
+        close();
         break;
     }
 }

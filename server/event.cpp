@@ -45,6 +45,12 @@ void Event::show()
                           }));
 }
 
+void Event::close()
+{
+    sendevt(3,QVariantMap());
+    evtmgr->DelEvent(evid);
+}
+
 void Event::reconnected_t(MainNetworkManger * p)
 {
     this->ntwkmgr=p;
