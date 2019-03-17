@@ -20,7 +20,7 @@ EventManger::EventManger(MainNetworkManger *parent) : QObject(parent),ntwkmgr(pa
     connect(parent,&MainNetworkManger::Message,this,&EventManger::recv);
     connect(parent,&MainNetworkManger::dscnktd,this,&EventManger::disconnected);
     qDebug() << "New ["<<this<<"]" << ntwkmgr->getScid();
-    NE(connected);
+    NewEvent(1);
 }
 
 void EventManger::recv(QVariantMap map)
@@ -33,8 +33,7 @@ void EventManger::recv(QVariantMap map)
     {
         if (sockets[ntwkmgr->getScid()]->events.contains(map.value(JSON_EVENT_ID).toString()))
         {
-            Event* p=sockets[ntwkmgr->getScid()]->events[map.value(JSON_EVENT_ID).toString()];
-            p->recv_t(map.value(JSON_ARG).toMap());
+            sockets[ntwkmgr->getScid()]->events[map.value(JSON_EVENT_ID).toString()]->recv_t(map);
         } else {
             ntwkmgr->senderr(-2,"new",File_Codes::read(-2));
         }

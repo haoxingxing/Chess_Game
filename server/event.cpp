@@ -3,7 +3,6 @@
 #include "eventmanger.h"
 Event::Event(QString name,MainNetworkManger *parent,QString e,EventManger* par) : QObject(nullptr),ntwkmgr(parent),evtmgr(par),type(name),evid(e)
 {
-    connect(parent,&MainNetworkManger::Message,this,&Event::recv_t);
     connect(parent,&MainNetworkManger::dscnktd,this,&Event::dscnktd);
 }
 
@@ -49,7 +48,6 @@ void Event::show()
 void Event::reconnected_t(MainNetworkManger * p)
 {
     this->ntwkmgr=p;
-    connect(p,&MainNetworkManger::Message,this,&Event::recv_t);
     connect(p,&MainNetworkManger::dscnktd,this,&Event::dscnktd);
     this->reconnected();
 }
