@@ -1,4 +1,5 @@
 {
+    "c-cpp-flylint.clang.standardLibs": ["c++1z"],
     "c-cpp-flylint.cppcheck.includePaths": [
         "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.16.27023/include",
         "D:/Software/Qt/5.12.0/msvc_static/include",
