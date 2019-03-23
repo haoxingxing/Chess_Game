@@ -1,5 +1,6 @@
 {
 "clang-format.executable": "C:/Program Files/LLVM/bin/clang-format.exe",
+"workbench.colorTheme": "One Dark Pro",
 "files.associations": {
     "qjsonobject": "cpp",
     "ostream": "cpp",
