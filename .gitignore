@@ -78,3 +78,4 @@ moc_predefs.h
 *.lib
 *.exp
 .qmake.stash
+user_data.json
