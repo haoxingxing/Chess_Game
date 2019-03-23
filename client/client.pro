@@ -72,14 +72,3 @@ DISTFILES += \
 RESOURCES += \
     icon.qrc
 RC_ICONS = "main.ico"
-Release:DESTDIR = client_release
-Release:OBJECTS_DIR = client_release/.obj
-Release:MOC_DIR = client_release/.moc
-Release:RCC_DIR = client_release/.rcc
-Release:UI_DIR = client_release/.ui
-
-Debug:DESTDIR = client_debug
-Debug:OBJECTS_DIR = client_debug/.obj
-Debug:MOC_DIR = client_debug/.moc
-Debug:RCC_DIR = client_debug/.rcc
-Debug:UI_DIR = client_debug/.ui

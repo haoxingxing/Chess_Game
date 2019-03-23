@@ -1,5 +1,13 @@
 @echo off
 title qmake and nmake build prompt
+rem if not exist build (
+rem    md build
+rem )
+rem cd build
+rem if not exist %1 (
+rem    md %1
+rem )
+rem cd %1
 set VCINSTALLDIR=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC
 set QTDIR=D:\Software\Qt\5.12.0\msvc_static\
 set PATH=%VCINSTALLDIR%\bin;%QTDIR%\bin;C:\Program Files\7-Zip;%PATH%
