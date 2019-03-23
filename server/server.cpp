@@ -13,10 +13,8 @@ server::server(QObject *parent) : QObject(parent)
 
 void server::newConnection()
 {
-    while(serverv->hasPendingConnections()){
-        QTcpSocket *sock=serverv->nextPendingConnection();
-        new EventManger(new MainNetworkManger(this,sock));
-    }
+    while(serverv->hasPendingConnections())
+        (new EventManger(new MainNetworkManger(this,serverv->nextPendingConnection())))->exec();    
 }
 
 void server::err()

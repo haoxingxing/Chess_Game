@@ -8,7 +8,7 @@
             "args": [
                 "/c",
                 "${workspaceRoot}/build.cmd",
-                "server/server.pro",
+                "server",
                 "debug"
             ],
             "group": {
@@ -20,13 +20,13 @@
             ]
         },
         {
-            "label": "client Debug ",
+            "label": "client Debug",
             "type": "shell",
             "command": "cmd",
             "args": [
                 "/c",
                 "${workspaceRoot}/build.cmd",
-                "client/client.pro",
+                "client",
                 "debug"
             ],
             "group": {
@@ -38,13 +38,13 @@
             ]
         },
         {
-            "label": "client Release ",
+            "label": "client Release",
             "type": "shell",
             "command": "cmd",
             "args": [
                 "/c",
                 "${workspaceRoot}/build.cmd",
-                "server/server.pro",
+                "server",
                 "release"
             ],
             "group": {
@@ -56,13 +56,13 @@
             ]
         },
         {
-            "label": "client Release ",
+            "label": "client Release",
             "type": "shell",
             "command": "cmd",
             "args": [
                 "/c",
                 "${workspaceRoot}/build.cmd",
-                "client/client.pro",
+                "client",
                 "release"
             ],
             "group": {

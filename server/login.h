@@ -9,6 +9,7 @@
 
 class Login : public Event
 {
+   Q_OBJECT
 public:
    Login(MainNetworkManger*rp,QString evid,EventManger*);
    void recv(const int&,const QVariantMap&);

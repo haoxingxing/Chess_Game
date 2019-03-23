@@ -22,7 +22,6 @@ public:
         chat,
         match
     };
-signals:
 
 public slots:
     void exec();

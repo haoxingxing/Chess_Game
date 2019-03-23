@@ -77,3 +77,4 @@ Thumbs.db
 moc_predefs.h
 *.lib
 *.exp
+.qmake.stash

@@ -5,6 +5,7 @@
 #include "mainnetworkmanger.h"
 class Event
 {
+
 public:
     explicit Event(MainNetworkManger* ntwkmgr,QString evid);
     virtual ~Event(){}
