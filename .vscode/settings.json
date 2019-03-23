@@ -1,6 +1,6 @@
 {
     "clang-format.executable": "C:/Program Files/LLVM/bin/clang-format.exe",
-    "workbench.colorTheme": "One Dark Pro",
+    "workbench.colorTheme": "Visual Studio Light",
     "[cpp]": {
         "editor.quickSuggestions": true
     },
@@ -19,7 +19,8 @@
         "qwebenginehistory": "cpp",
         "iosfwd": "cpp",
         "xstring": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "qobject": "cpp"
     },
     "files.exclude": {
         "**/.git": true,

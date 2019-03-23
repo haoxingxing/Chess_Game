@@ -37,7 +37,6 @@ void menu::recv(int s,QVariantMap)
         break;
     case 9:
         this->show();
-
     }
 }
 

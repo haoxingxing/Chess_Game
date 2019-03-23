@@ -111,8 +111,9 @@ void MainNetworkManger::Disconnected()
     ui->label_2->show();
     foreach (Event*p,events)
     {
-        p->disconnected();
+        delete p;
     }
+    events.clear();
     this->activateWindow();
 }
 

@@ -97,6 +97,5 @@ void Login::Logout()
     isLogin=false;
     emit changeStatus();
     username.clear();
-    sendevt(2,QVariantMap({}));
-    show();
+    sendevt(2,QVariantMap({}));        
 }

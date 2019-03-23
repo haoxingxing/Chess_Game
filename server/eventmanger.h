@@ -5,6 +5,8 @@
 #include <QObject>
 #include "event.h"
 #include "server.h"
+#include <QMap>
+
 #define NE(whattime) NewEvent(File_Codes::readint(#whattime))
 
 class Login;

@@ -25,13 +25,14 @@ EventManger::EventManger(MainNetworkManger *parent) : QObject(parent),ntwkmgr(pa
 void EventManger::exec()
 {
     Login* l=dynamic_cast<Login*>(GetEvent(NewEvent(login)));
-    connect(l,&Login::changeStatus,this,&EventManger::LoginStatusChanged);
     l->exec();
+    LoginStatusChanged();
     if (islogged)
     {
         NewEvent(menu);
     }
     l->exec();
+    LoginStatusChanged();
 }
 
 void EventManger::recv(QVariantMap map)
@@ -146,7 +147,8 @@ void EventManger::disconnected()
 
 void EventManger::LoginStatusChanged()
 {
-    if (!islogged)
+    islogged=!islogged;
+    if (islogged)
     {
         islogged=true;
         users[username][ntwkmgr->getScid()]=sockets[ntwkmgr->getScid()];
@@ -171,6 +173,7 @@ void EventManger::LoginStatusChanged()
         {
             delete p;
         }
+        sockets.value(ntwkmgr->getScid())->events.clear();
         ntwkmgr->disconnect();        
     }
 }

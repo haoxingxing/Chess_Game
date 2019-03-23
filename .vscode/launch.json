@@ -5,7 +5,7 @@
             "name": "Client",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/client_debug/client.exe",
+            "program": "${workspaceFolder}/build/client/debug/client.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -17,13 +17,13 @@
             "name": "Server",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/server_debug/server.exe",
+            "program": "${workspaceFolder}/build/server/debug/server.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "preLaunchTask": "server Debug",
-            "externalConsole": false
+            "externalConsole": true
         }
     ]
 }
