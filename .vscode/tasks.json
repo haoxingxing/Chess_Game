@@ -7,7 +7,8 @@
             "command": "cmd",
             "args": [
                 "/c",
-                "${workspaceRoot}/server/build.cmd",
+                "${workspaceRoot}/build.cmd",
+                "server/server.pro",
                 "debug"
             ],
             "group": {
@@ -24,8 +25,45 @@
             "command": "cmd",
             "args": [
                 "/c",
-                "${workspaceRoot}/client/build.cmd",
+                "${workspaceRoot}/build.cmd",
+                "client/client.pro",
                 "debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ]
+        },
+        {
+            "label": "client Release ",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "${workspaceRoot}/build.cmd",
+                "server/server.pro",
+                "release"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ]
+        },
+        {
+            "label": "client Release ",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "${workspaceRoot}/build.cmd",
+                "client/client.pro",
+                "release"
             ],
             "group": {
                 "kind": "build",
