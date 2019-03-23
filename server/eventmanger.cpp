@@ -74,7 +74,7 @@ QString EventManger::NewEvent(EventManger::event_types id)
         pointer=new Menu(ntwkmgr,evid,this);
         break;
     case rank:
-        pointer=new ranking(ntwkmgr,evid,this);
+        //pointer=new ranking(ntwkmgr,evid,this);
         break;
     default:
         ntwkmgr->senderr(-1,"new",File_Codes::read(-1));
@@ -133,7 +133,6 @@ void EventManger::disconnected()
     sockets.remove(ntwkmgr->getScid());
     qDebug() << "Deleted ["<<this<<"]"<< ntwkmgr->getScid();
     delete ntwkmgr;
-    delete this;
 }
 
 void EventManger::LoginStatusChanged()
