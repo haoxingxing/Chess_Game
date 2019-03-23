@@ -4,6 +4,12 @@
 Event::Event(QString name,MainNetworkManger *parent,QString e,EventManger* par) : QObject(nullptr),ntwkmgr(parent),evtmgr(par),type(name),evid(e)
 {
     connect(parent,&MainNetworkManger::dscnktd,this,&Event::dscnktd);
+    qDebug()<<"Created New Event: " <<evid<<"["<<this<<"] in Socket "<<ntwkmgr->getScid();
+}
+
+Event::~Event()
+{
+    qDebug() << "Deleted Event "<<evid<<"["<<this<<"]";
 }
 
 void Event::dscnktd()

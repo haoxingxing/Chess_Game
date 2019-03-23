@@ -4,9 +4,14 @@
     "-3":"无窗口信息",
     "-4":"用户名或密码错误",
     "-5":"用户名已存在",
+    "-6":"已禁止创建事件",
     "login_wi":{
         "title": "登录",
         "stylesheet": "",
+        "isshow":true
+    },
+    "menu_wi":{
+        "title":"菜单",
         "isshow":true
     },
     "connected":1,

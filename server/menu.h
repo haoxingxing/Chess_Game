@@ -4,11 +4,11 @@
 #include <QObject>
 #include "event.h"
 #include "eventmanger.h"
-class menu : public Event
+class Menu : public Event
 {
     Q_OBJECT
 public:
-    menu(MainNetworkManger*rp,QString evid,EventManger* e);
+    Menu(MainNetworkManger*rp,QString evid,EventManger* e);
     void recv(const int&s, const QVariantMap&);
     void rank_finished(QStringList l);
 private:

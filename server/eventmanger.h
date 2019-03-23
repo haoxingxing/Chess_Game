@@ -1,6 +1,7 @@
 #ifndef EVENTMANGER_H
 #define EVENTMANGER_H
 
+#include <QEventLoop>
 #include <QObject>
 #include "event.h"
 #include "server.h"
@@ -13,14 +14,24 @@ class EventManger : public QObject
 public:
     explicit EventManger(MainNetworkManger *ntwkmgr);
     QString username;
+    enum event_types{
+        none,
+        login,
+        menu,
+        rank,
+        chat,
+        match
+    };
 signals:
 
 public slots:
+    void exec();
     void recv(QVariantMap);
-    QString NewEvent(int id);
+    QString NewEvent(event_types id);
     void DelEvent(QString evid);
     Event* GetEvent(QString evid);
     QList<Event*> FindEvent(QString type);
+
 private:
     friend Login;
     struct Socket{
@@ -34,6 +45,7 @@ private:
     bool islogged = false;
     void LoginStatusChanged();
     void AnotherLogged();
+    QEventLoop loop;
 
 };
 

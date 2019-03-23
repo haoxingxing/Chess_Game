@@ -20,14 +20,27 @@ EventManger::EventManger(MainNetworkManger *parent) : QObject(parent),ntwkmgr(pa
     connect(parent,&MainNetworkManger::Message,this,&EventManger::recv);
     connect(parent,&MainNetworkManger::dscnktd,this,&EventManger::disconnected);
     qDebug() << "New ["<<this<<"]" << ntwkmgr->getScid();
-    NewEvent(1);
+}
+
+void EventManger::exec()
+{
+    Login* l=dynamic_cast<Login*>(GetEvent(NewEvent(login)));
+    connect(l,&Login::changeStatus,this,&EventManger::LoginStatusChanged);
+    l->exec();
 }
 
 void EventManger::recv(QVariantMap map)
 {
     if (map.value(JSON_EVENT_ID).toString()=="new")
     {
+#if 0
         NewEvent(map.value(JSON_NEW_EVENT_ID).toInt());
+#else
+        ntwkmgr->senderr(-6,"new",File_Codes::read(-2));
+#endif
+        /*
+         * Disabled Client To Request for Event
+         */
     }
     else
     {
@@ -53,21 +66,21 @@ QList<Event*> EventManger::FindEvent(QString type)
     return list;
 }
 
-QString EventManger::NewEvent(int id)
+QString EventManger::NewEvent(EventManger::event_types id)
 {
     QString evid = Random::GetRandomString(EID_LEN);
     Event* pointer;
     switch (id)
     {
-    case 0:
+    case none:
         return "";
-    case 1:
+    case login:
         pointer=new Login(ntwkmgr,evid,this);
         break;
-    case 2:
-        pointer=new menu(ntwkmgr,evid,this);
+    case menu:
+        pointer=new Menu(ntwkmgr,evid,this);
         break;
-    case 3:
+    case rank:
         pointer=new ranking(ntwkmgr,evid,this);
         break;
     default:
@@ -76,7 +89,6 @@ QString EventManger::NewEvent(int id)
     }
     this->sockets.value(ntwkmgr->getScid())->events.insert(evid,pointer);
     ntwkmgr->sendnev(id,evid);
-    qDebug()<<"Created New Event: " <<evid<<"["<<pointer<<"] in Socket "<<ntwkmgr->getScid();
     return evid;
 }
 
@@ -84,7 +96,6 @@ void EventManger::DelEvent(QString evid)
 {
     delete this->sockets[ntwkmgr->getScid()]->events[evid];
     this->sockets[ntwkmgr->getScid()]->events.remove(evid);
-    qDebug() << "Deleted Event "<<evid;
 }
 
 Event *EventManger::GetEvent(QString evid)
@@ -101,7 +112,6 @@ void EventManger::disconnected()
         sockets.value(ntwkmgr->getScid())->events.remove(p->evid);
         if (!p->isreconnectedable())
         {
-            qDebug() << "Deleted Event "<<p->evid;
             delete p;
         }
     }
@@ -120,7 +130,6 @@ void EventManger::disconnected()
         qDebug() << "Deleting events";
         foreach(Event* p,sockets.value(ntwkmgr->getScid())->events)
         {
-            qDebug() << "Deleted Event "<<p->evid;
             delete p;
         }
     }

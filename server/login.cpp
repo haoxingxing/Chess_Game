@@ -24,6 +24,12 @@ void Login::recv(const int& status,const QVariantMap& map)
     }
 }
 
+void Login::exec()
+{
+    connect(this,&Login::changeStatus,&event,&QEventLoop::quit);
+    event.exec();
+}
+
 bool Login::login(QString username, QString password)
 {
     if (readfromfile().value(username).toString()==QString("%1").arg(QString(QCryptographicHash::hash((password+"Server_Sencond_Slat_+++").toUtf8(),QCryptographicHash::Md5).toHex())))
@@ -35,7 +41,7 @@ bool Login::login(QString username, QString password)
                 std::make_pair("username",username)
                               }));
         hide();
-        this->next_step();
+        emit changeStatus();
         return true;
     }
     else
@@ -64,7 +70,7 @@ bool Login::_register(QString username, QString password)
                 std::make_pair("username",username)
                               }));
         hide();
-        this->next_step();
+        emit changeStatus();
         return true;
     }
 }
@@ -89,20 +95,8 @@ QVariantMap Login::readfromfile()
 void Login::Logout()
 {
     isLogin=false;
-    changeStatus();
+    emit changeStatus();
     username.clear();
     sendevt(2,QVariantMap({}));
     show();
-}
-
-void Login::changeStatus()
-{
-    evtmgr->islogged=isLogin;
-    evtmgr->username=username;
-    evtmgr->LoginStatusChanged();
-}
-
-void Login::next_step()
-{
-    evtmgr->NewEvent(2);
 }

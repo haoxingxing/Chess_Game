@@ -72,3 +72,8 @@ Thumbs.db
 *.dll
 *.exe
 
+.vscode/ipch
+*_plugin_import.cpp
+moc_predefs.h
+*.lib
+*.exp

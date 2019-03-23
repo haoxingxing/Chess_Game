@@ -12,16 +12,17 @@ class Login : public Event
 public:
    Login(MainNetworkManger*rp,QString evid,EventManger*);
    void recv(const int&,const QVariantMap&);
+   void exec();
    bool login(QString username,QString password);
    bool _register(QString username,QString password);
    void Logout();
    QString username;
    bool isLogin = false;
+signals:
+   void changeStatus();
 private:
    static void writetofile(QVariantMap vm);
    static QVariantMap readfromfile();
-   void changeStatus();
-   void next_step();
 };
 
 #endif // LOGIN_H

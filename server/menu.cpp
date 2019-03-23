@@ -2,19 +2,19 @@
 #include "eventmanger.h"
 #include "file_codes.h"
 #include "ranking.h"
-menu::menu(MainNetworkManger *rp,QString evid,EventManger* e):Event(MENU_HEAD,rp,evid,e){
+Menu::Menu(MainNetworkManger *rp,QString evid,EventManger* e):Event(MENU_HEAD,rp,evid,e){
 
 }
 
-void menu::recv(const int & s, const QVariantMap &)
+void Menu::recv(const int & s, const QVariantMap &)
 {
     switch (s) {
     case 301:
     {
-        rank_event_id=evtmgr->NewEvent(3);
+        rank_event_id=evtmgr->NewEvent(EventManger::event_types::rank);
         Event* e=evtmgr->GetEvent(rank_event_id);
         e->recv(401,File_Codes::readmap("menu_rank_1"));
-        connect(dynamic_cast<ranking*>(e),&ranking::fulled,this,&menu::rank_finished);
+        connect(dynamic_cast<ranking*>(e),&ranking::fulled,this,&Menu::rank_finished);
         sendevt(8,QVariantMap());
         break;
     }
@@ -27,7 +27,7 @@ void menu::recv(const int & s, const QVariantMap &)
     }
 }
 
-void menu::rank_finished(QStringList l)
+void Menu::rank_finished(QStringList l)
 {
     sendevt(9,QVariantMap());
 }

@@ -1,6 +1,6 @@
 #ifndef RQSTPRCS_H
 #define RQSTPRCS_H
-
+#include <QEventLoop>
 #include <QObject>
 #include "mainnetworkmanger.h"
 class EventManger;
@@ -9,6 +9,7 @@ class Event : public QObject
     Q_OBJECT
 public:
     explicit Event(QString name,MainNetworkManger *parent,QString evid,EventManger* par);
+    virtual ~Event();
     virtual void recv(const int&,const QVariantMap&) = 0;
     virtual void dscnktd();
     virtual void reconnected();
@@ -17,6 +18,7 @@ public:
     void hide();
     void show();
     void close();
+    virtual void exec(){}
     void reconnected_t(MainNetworkManger*);
     void sendevt(const int &sid, const QVariantMap &args);
     void senderr(const int &eid);
@@ -24,6 +26,7 @@ public:
     QString GetType() const;
     EventManger* evtmgr;
     friend EventManger;
+    QEventLoop event;
 public slots:
     void recv_t(QVariantMap);
 private:
