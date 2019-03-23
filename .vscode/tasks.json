@@ -15,17 +15,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": {
-                "owner": "cpp",
-                "fileLocation": ["relative", "${workspaceRoot}"],
-                "pattern": {
-                    "regexp": "^(.*)\\((\\d+)\\):\\s+(warning|error) (\\w*:\\s+.*)$",
-                    "file": 1,
-                    "line": 2,
-                    "severity": 3,
-                    "message": 4
-                }
-            }
+            "problemMatcher": "$msCompile"
         },
         {
             "label": "client Debug",
@@ -41,17 +31,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": {
-                "owner": "cpp",
-                "fileLocation": ["relative", "${workspaceRoot}"],
-                "pattern": {
-                    "regexp": "^(.*)\\((\\d+)\\):\\s+(warning|error) (\\w*:\\s+.*)$",
-                    "file": 1,
-                    "line": 2,
-                    "severity": 3,
-                    "message": 4
-                }
-            }
+            "problemMatcher": "$msCompile"
         },
         {
             "label": "client Release",
@@ -67,17 +47,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": {
-                "owner": "cpp",
-                "fileLocation": ["relative", "${workspaceRoot}"],
-                "pattern": {
-                    "regexp": "^(.*)\\((\\d+)\\):\\s+(warning|error) (\\w*:\\s+.*)$",
-                    "file": 1,
-                    "line": 2,
-                    "severity": 3,
-                    "message": 4
-                }
-            }
+            "problemMatcher": "$msCompile"
         },
         {
             "label": "client Release",
@@ -93,17 +63,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": {
-                "owner": "cpp",
-                "fileLocation": ["relative", "${workspaceRoot}"],
-                "pattern": {
-                    "regexp": "^(.*)\\((\\d+)\\):\\s+(warning|error) (\\w*:\\s+.*)$",
-                    "file": 1,
-                    "line": 2,
-                    "severity": 3,
-                    "message": 4
-                }
-            }
+            "problemMatcher": "$msCompile"
         }
     ]
 }

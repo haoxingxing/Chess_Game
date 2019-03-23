@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [        
+        {
+            "name": "Client",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/debug/client.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "preLaunchTask": "Debug",
+            "externalConsole": false
+        }
+    ]
+}

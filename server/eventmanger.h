@@ -35,12 +35,8 @@ public slots:
 
 private:
     friend Login;
-    struct Socket{
-        QMap<QString/* Event ID */,Event*> events;
-        bool isonline = true;
-    };
-    static QMap<QString /* Socket ID */,Socket*> sockets;
-    static QMap<QString /* Username */,QMap<QString,Socket*>> users;
+    static QMap<QString /* Socket ID */,QMap<QString/* Event ID */,Event*>*> sockets;
+    static QMap<QString /* Username */,QMap<QString,QMap<QString/* Event ID */,Event*>*>> users;
     void disconnected();
     MainNetworkManger *ntwkmgr;
     bool islogged = false;

@@ -4,9 +4,7 @@
         {
             "name": "msvc-static",
             "intelliSenseMode": "msvc-x64",
-            "includePath": [
-                "${workspaceRoot}/build/client",
-                "${workspaceRoot}/build/server",
+            "includePath": [                
                 "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.16.27023/include",
                 "D:/Software/Qt/5.12.0/msvc_static/include",
                 "D:/Software/Qt/5.12.0/msvc_static/include/Qt3DAnimation",
@@ -81,8 +79,6 @@
             ],
             "browse": {
                 "path": [
-                    "${workspaceRoot}/build/client",
-                    "${workspaceRoot}/build/server",
                     "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.16.27023/include",
                     "D:/Software/Qt/5.12.0/msvc_static/include",
                     "D:/Software/Qt/5.12.0/msvc_static/include/Qt3DAnimation",

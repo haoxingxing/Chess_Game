@@ -11,11 +11,12 @@ void Menu::recv(const int & s, const QVariantMap &)
     switch (s) {
     case 301:
     {
-        rank_event_id=evtmgr->NewEvent(EventManger::event_types::rank);
-        Event* e=evtmgr->GetEvent(rank_event_id);
+        Event* e=evtmgr->GetEvent(evtmgr->NewEvent(EventManger::event_types::rank));
         e->recv(401,File_Codes::readmap("menu_rank_1"));
-        connect(dynamic_cast<ranking*>(e),&ranking::fulled,this,&Menu::rank_finished);
+        sendevt(9,QVariantMap());
+        e->exec();        
         sendevt(8,QVariantMap());
+                
         break;
     }
     case 302:
@@ -25,9 +26,4 @@ void Menu::recv(const int & s, const QVariantMap &)
         close();
         break;
     }
-}
-
-void Menu::rank_finished(QStringList l)
-{
-    sendevt(9,QVariantMap());
 }

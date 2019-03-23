@@ -10,7 +10,6 @@ class Menu : public Event
 public:
     Menu(MainNetworkManger*rp,QString evid,EventManger* e);
     void recv(const int&s, const QVariantMap&);
-    void rank_finished(QStringList l);
 private:
     QString rank_event_id;
 };

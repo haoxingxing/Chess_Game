@@ -2,21 +2,12 @@
 #include "random.h"
 #include "file_codes.h"
 #include "QDebug"
-/*
- * id:
- *  1: login
- *  2: menu
- *  3: rank
- *  4: chess_place
- */
-
-
 #include "login.h"
 #include "menu.h"
 #include "ranking.h"
 EventManger::EventManger(MainNetworkManger *parent) : QObject(parent),ntwkmgr(parent)
 {
-    this->sockets.insert(ntwkmgr->getScid(),new Socket);
+    sockets[ntwkmgr->getScid()]=new QMap<QString,Event*>;
     connect(parent,&MainNetworkManger::Message,this,&EventManger::recv);
     connect(parent,&MainNetworkManger::dscnktd,this,&EventManger::disconnected);
     qDebug() << "New ["<<this<<"]" << ntwkmgr->getScid();
@@ -50,9 +41,9 @@ void EventManger::recv(QVariantMap map)
     }
     else
     {
-        if (sockets[ntwkmgr->getScid()]->events.contains(map.value(JSON_EVENT_ID).toString()))
+        if (sockets[ntwkmgr->getScid()]->contains(map.value(JSON_EVENT_ID).toString()))
         {
-            sockets[ntwkmgr->getScid()]->events[map.value(JSON_EVENT_ID).toString()]->recv_t(map);
+            (*sockets[ntwkmgr->getScid()])[map.value(JSON_EVENT_ID).toString()]->recv_t(map);
         } else {
             ntwkmgr->senderr(-2,"new",File_Codes::read(-2));
         }
@@ -62,13 +53,9 @@ void EventManger::recv(QVariantMap map)
 QList<Event*> EventManger::FindEvent(QString type)
 {
     QList<Event*> list;
-    foreach(Event* p,sockets.value(ntwkmgr->getScid())->events)
-    {
-        if (p->GetType()==type)
-        {
-            list.push_back(p);
-        }
-    }
+    foreach(Event* p,*sockets[ntwkmgr->getScid()])    
+        if (p->GetType()==type)        
+            list.push_back(p);            
     return list;
 }
 
@@ -93,56 +80,60 @@ QString EventManger::NewEvent(EventManger::event_types id)
         ntwkmgr->senderr(-1,"new",File_Codes::read(-1));
         return "";
     }
-    this->sockets.value(ntwkmgr->getScid())->events.insert(evid,pointer);
+    this->sockets.value(ntwkmgr->getScid())->insert(evid,pointer);
     ntwkmgr->sendnev(id,evid);
     return evid;
 }
 
 void EventManger::DelEvent(QString evid)
 {
-    delete this->sockets[ntwkmgr->getScid()]->events[evid];
-    this->sockets[ntwkmgr->getScid()]->events.remove(evid);
+    delete (*this->sockets[ntwkmgr->getScid()])[evid];
+    this->sockets[ntwkmgr->getScid()]->remove(evid);
 }
 
 Event *EventManger::GetEvent(QString evid)
 {
-    return this->sockets[ntwkmgr->getScid()]->events[evid];
+    return (*this->sockets[ntwkmgr->getScid()])[evid];
 }
 
 void EventManger::disconnected()
 {
     qDebug()<<"Disconnected Socket "<<ntwkmgr->getScid();
-    qDebug()<<"Deleting unreconnectible events";
-    foreach(Event* p,sockets.value(ntwkmgr->getScid())->events)
-    {
-        sockets.value(ntwkmgr->getScid())->events.remove(p->evid);
-        if (!p->isreconnectedable())
-        {
-            delete p;
-        }
-    }
     if (islogged)
     {
+        
         qDebug() << "Moving reconnectible events";
-        foreach(Event* e,users[username][ntwkmgr->getScid()]->events)
+        foreach(Event* e,*(users[username])[ntwkmgr->getScid()])
         {
-            users[username]["offlined"]->events[e->evid]=e;
-            qDebug() << "Moved Event "<<e->evid;
+            if (e->isreconnectedable())
+            {
+                (*users[username]["offlined"])[e->evid]=e;
+                users[username][ntwkmgr->getScid()]->remove(e->evid);
+                qDebug() << "Moved Event "<<e->evid;
+            }
+        }
+        qDebug()<<"Deleting unreconnectible events";
+        foreach(Event* p,*sockets[ntwkmgr->getScid()])
+        {
+            sockets[ntwkmgr->getScid()]->remove(p->evid);
+            delete p;
         }
         users[username].remove(ntwkmgr->getScid());
     }
     else
     {
         qDebug() << "Deleting events";
-        foreach(Event* p,sockets.value(ntwkmgr->getScid())->events)
+        foreach(Event* p,*sockets[ntwkmgr->getScid()])
         {
+            sockets[ntwkmgr->getScid()]->remove(p->evid);
             delete p;
         }
+        delete sockets[ntwkmgr->getScid()];
     }
     sockets.remove(ntwkmgr->getScid());
     qDebug() << "Deleted ["<<this<<"]"<< ntwkmgr->getScid();
-    ntwkmgr->deleteLater();
-    this->deleteLater();
+    delete ntwkmgr;
+    delete this;
 }
 
 void EventManger::LoginStatusChanged()
@@ -150,33 +141,33 @@ void EventManger::LoginStatusChanged()
     islogged=!islogged;
     if (islogged)
     {
-        islogged=true;
         users[username][ntwkmgr->getScid()]=sockets[ntwkmgr->getScid()];
         if (users[username].contains("offlined"))
         {
-            QMapIterator<QString,Event*> it(users[username]["offlined"]->events);
+            QMapIterator<QString,Event*> it(*users[username]["offlined"]);
             while (it.hasNext())
             {
                 it.next();
-                users[username][ntwkmgr->getScid()]->events.insert(it.key(),it.value());
+                users[username][ntwkmgr->getScid()]->insert(it.key(),it.value());
                 it.value()->reconnected_t(ntwkmgr);
-            }
+            }            
+            delete users[username]["offlined"];
             users[username].remove("offlined");
         }
     }
     else {
         qDebug() << "User Logged Out";        
-        islogged=false;        
-        users[username].remove(ntwkmgr->getScid());
         qDebug() << "Delete All Events";
-        foreach(Event* p,sockets.value(ntwkmgr->getScid())->events)
+        foreach(Event* p,*sockets[ntwkmgr->getScid()])        
         {
-            delete p;
+            sockets[ntwkmgr->getScid()]->remove(p->evid);
+            delete p;        
         }
-        sockets.value(ntwkmgr->getScid())->events.clear();
+        users[username].remove(ntwkmgr->getScid());
+        sockets.value(ntwkmgr->getScid())->clear();    
         ntwkmgr->disconnect();        
     }
 }
-QMap<QString,EventManger::Socket*> EventManger::sockets=QMap<QString,EventManger::Socket*>();
+QMap<QString,QMap<QString/* Event ID */,Event*>*> EventManger::sockets=QMap<QString,QMap<QString/* Event ID */,Event*>*>();
 
-QMap<QString,QMap<QString,EventManger::Socket*>> EventManger::users=QMap<QString,QMap<QString,EventManger::Socket*>>();
+QMap<QString,QMap<QString,QMap<QString/* Event ID */,Event*>*>> EventManger::users=QMap<QString,QMap<QString,QMap<QString/* Event ID */,Event*>*>>();
