@@ -79,3 +79,7 @@ moc_predefs.h
 *.exp
 .qmake.stash
 user_data.json
+server_debug
+server_release
+client_debug
+client_release

@@ -31,6 +31,7 @@ public:
     void sendevt(const int &sid,const QString &evid,const QVariantMap &args);
     void sendnev(const int &id,const QString &evid);
     QString getScid() const;
+    void disconnect();
 signals:
     void Message(QVariantMap);
     void dscnktd();

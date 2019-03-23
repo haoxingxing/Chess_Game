@@ -60,3 +60,6 @@ QString MainNetworkManger::getScid() const
     return scid;
 }
 
+void MainNetworkManger::disconnect(){
+    socket->disconnectFromHost();
+}

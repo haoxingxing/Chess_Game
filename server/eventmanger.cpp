@@ -27,6 +27,11 @@ void EventManger::exec()
     Login* l=dynamic_cast<Login*>(GetEvent(NewEvent(login)));
     connect(l,&Login::changeStatus,this,&EventManger::LoginStatusChanged);
     l->exec();
+    if (islogged)
+    {
+        NewEvent(menu);
+    }
+    l->exec();
 }
 
 void EventManger::recv(QVariantMap map)
@@ -141,8 +146,9 @@ void EventManger::disconnected()
 
 void EventManger::LoginStatusChanged()
 {
-    if (islogged)
+    if (!islogged)
     {
+        islogged=true;
         users[username][ntwkmgr->getScid()]=sockets[ntwkmgr->getScid()];
         if (users[username].contains("offlined"))
         {
@@ -157,7 +163,15 @@ void EventManger::LoginStatusChanged()
         }
     }
     else {
+        qDebug() << "User Logged Out";        
+        islogged=false;        
         users[username].remove(ntwkmgr->getScid());
+        qDebug() << "Delete All Events";
+        foreach(Event* p,sockets.value(ntwkmgr->getScid())->events)
+        {
+            delete p;
+        }
+        ntwkmgr->disconnect();        
     }
 }
 QMap<QString,EventManger::Socket*> EventManger::sockets=QMap<QString,EventManger::Socket*>();

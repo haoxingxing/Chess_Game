@@ -51,3 +51,15 @@ HEADERS += \
     menu.h
 
 DISTFILES +=
+
+Release:DESTDIR = server_release
+Release:OBJECTS_DIR = server_release/.obj
+Release:MOC_DIR = server_release/.moc
+Release:RCC_DIR = server_release/.rcc
+Release:UI_DIR = server_release/.ui
+
+Debug:DESTDIR = server_debug
+Debug:OBJECTS_DIR = server_debug/.obj
+Debug:MOC_DIR = server_debug/.moc
+Debug:RCC_DIR = server_debug/.rcc
+Debug:UI_DIR = server_debug/.ui
