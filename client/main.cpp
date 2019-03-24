@@ -14,3 +14,4 @@ int main(int argc, char *argv[])
 
     return a.exec();
 }
+#error PENDING: PROGRAM STOPPED TILL IF IT IS NECESSARY

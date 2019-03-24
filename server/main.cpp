@@ -2,6 +2,7 @@
 #include "server.h"
 #include <QString>
 #include <QTextCodec>
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
@@ -9,3 +10,6 @@ int main(int argc, char *argv[])
     server n;
     return a.exec();
 }
+
+
+#error PENDING: PROGRAM STOPPED TILL IF IT IS NECESSARY
